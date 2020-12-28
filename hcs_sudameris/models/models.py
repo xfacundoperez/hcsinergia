@@ -18,7 +18,7 @@ class sudameris_salary_inherit(models.Model):
 
 
 class sudameris_employee_salary_movement(models.Model):
-  _name = 'hcs_sudameris.sudameris_employee_salary_movement'
+  _name = 'sudameris_employee_salary_movement'
   _description = 'Movimientos de salario del empleado'
 
   empleado = fields.Many2one(string='Empleado', comodel_name='hr.employee')

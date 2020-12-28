@@ -35,8 +35,8 @@
       </field>
     </record>
     
-    <!--<record id="open_view_sudameris_salary_movement" model="ir.ui.view">
-      <field name="name">hr.employee.sudameris.salary.movement</field>
+    <record id="open_view_sudameris_salary_movement" model="ir.actions.act_window">
+      <field name="name">Movimiento de salarios</field>
       <field name="type">ir.actions.act_window</field>
       <field name="res_model">hcs_sudameris.sudameris_employee_salary_movement</field>
       <field name="view_mode">tree,kanban,form</field>
@@ -51,8 +51,8 @@
         id="menu_hr_employee_sudameris_salary_movement"
         name="Movimiento de salarios"
         action="open_view_sudameris_salary_movement"
-        parent="menu_hr_employee_payroll"
-        sequence="2"/>-->
+        parent="hr.menu_hr_employee_payroll"
+        sequence="2"/>
 
     <!-- explicit list view definition
     <record model="ir.ui.view" id="hcs_sudameris.list">
