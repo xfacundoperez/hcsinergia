@@ -1,0 +1,88 @@
+<odoo>
+  <data>
+    <!-- adding salary to job -->
+    <record id="sudameris_salary_inherith" model="ir.ui.view">
+      <field name="name">hr.employee.form.sudameris.salary.inherith</field>
+      <field name="model">hr.employee</field>
+      <field name="inherit_id" ref="hr.view_employee_form" />
+      <field name="arch" type="xml">
+        <field name="parent_id" position="after">
+          <field name="salario" />
+        </field>
+        <field name="identification_id" position="before">
+          <field name="tdoc" />
+          <field name="vencidoc" />
+        </field>
+        <xpath expr="//page[@name='hr_settings']" position="attributes">
+          <attribute name="invisible">1</attribute>
+        </xpath>
+        <xpath expr="//page[@name='hr_settings']" position="after">
+          <page name="hr_sudameris" string="Sudameris">
+            <group>
+                <group string="Información laboral">
+                    <field name="tpgroup"/>
+                    <field name="ejecutivo"/>
+                    <field name="tpcontrato"/>
+                    <field name="fingreso"/>
+                </group>
+                <group string="Información bancaria">
+                    <field name="ctnro" />
+                    <field name="ctnom"/>
+                </group>
+            </group>
+          </page>
+        </xpath>
+      </field>
+    </record>
+    
+    <!-- explicit list view definition
+    <record model="ir.ui.view" id="hcs_sudameris.list">
+      <field name="name">hcs_sudameris_list</field>
+      <field name="model">hcs_sudameris.hcs_sudameris</field>
+      <field name="arch" type="xml">
+        <tree>
+          <field name="name_sudame"/>
+        </tree>
+      </field>
+    </record> -->
+
+    <!-- actions opening views on models 
+    <record model="ir.actions.act_window" id="hcs_sudameris.action_window">
+      <field name="name">hcs_sudameris window</field>
+      <field name="res_model">hcs_sudameris.hcs_sudameris</field>
+      <field name="view_mode">tree,form</field>
+    </record> -->
+
+    <!-- server action to the one above -->
+<!--
+    <record model="ir.actions.server" id="hcs_sudameris.action_server">
+      <field name="name">hcs_sudameris server</field>
+      <field name="model_id" ref="model_hcs_hcs_sudameris_sudameris"/>
+      <field name="state">code</field>
+      <field name="code">
+        action = {
+          "type": "ir.actions.act_window",
+          "view_mode": "tree,form",
+          "res_model": model._name,
+        }
+      </field>
+    </record>
+-->
+
+    <!-- Top menu item
+    <menuitem name="hcs_sudameris" id="hcs_sudameris.menu_root"/>
+    -->
+    <!-- menu categories
+    <menuitem name="Menu 1" id="hcs_sudameris.menu_1" parent="hcs_sudameris.menu_root"/>
+    <menuitem name="Menu 2" id="hcs_sudameris.menu_2" parent="hcs_sudameris.menu_root"/>
+    -->
+    <!-- actions
+    <menuitem name="List" id="hcs_sudameris.menu_1_list" parent="hcs_sudameris.menu_1"
+              action="hcs_sudameris.action_window"/>
+              -->
+<!--
+    <menuitem name="Server to list" id="hcs_sudameris" parent="hcs_sudameris.menu_2"
+              action="hcs_sudameris.action_server"/>
+-->
+  </data>
+</odoo>
