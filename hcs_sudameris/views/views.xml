@@ -1,6 +1,6 @@
 <odoo>
   <data>
-    <!-- adding salary to job -->
+    <!-- Añadiendo campos a la vista del empleado -->
     <record id="sudameris_salary_inherith" model="ir.ui.view">
       <field name="name">hr.employee.form.sudameris.salary.inherith</field>
       <field name="model">hr.employee</field>
@@ -34,7 +34,34 @@
         </xpath>
       </field>
     </record>
-    
+
+
+    <!-- vista tree del modelo movimiento de salarios -->
+    <record id="tree_view_sudameris_salary_movement" model="ir.ui.view">
+      <field name="name">hr.employee.tree.sudameris.salary.movement</field>
+      <field name="model">sudameris_employee_salary_movement</field>
+      <field name="arch" type="xml">
+        <tree string="Movimientos de salario">
+          <field name="empleado" />
+        </tree>
+      </field>
+    </record>
+
+    <!-- vista form del modelo movimiento de salarios -->
+    <record id="form_view_sudameris_salary_movement" model="ir.ui.view">
+      <field name="name">hr.employee.form.sudameris.salary.movement</field>
+      <field name="model">sudameris_employee_salary_movement</field>
+      <field name="arch" type="xml">
+        <form string="Movimientos de salario">
+          <sheet>
+            <group>
+              <field name="empleado" />
+            </group>
+          </sheet>
+        </form>
+      </field>
+    </record>
+
     <record id="open_view_sudameris_salary_movement" model="ir.actions.act_window">
       <field name="name">Movimiento de salarios</field>
       <field name="type">ir.actions.act_window</field>
