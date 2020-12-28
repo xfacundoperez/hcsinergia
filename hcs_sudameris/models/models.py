@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-
 from odoo import models, fields, api
 from odoo.exceptions import UserError, ValidationError
 
@@ -16,6 +15,15 @@ class sudameris_salary_inherit(models.Model):
   fingreso = fields.Date(string="Fecha de ingreso")
   ctnro = fields.Char(string="Número de la Cuenta", digits=(9), readonly=True)
   ctnom = fields.Char(string="Descripción de la Cuenta", digits=(30), readonly=True)
+
+
+class sudameris_employee_salary_movement(models.Model):
+  _name = 'hcs_sudameris.sudameris_employee_salary_movement'
+  _description = 'Movimientos de salario del empleado'
+
+  empleado = fields.ManyToOne('hr.employee', 'id', 'Empleado')
+
+  # salario_def = fields.Float(string="Salario del empleado", digits=(18, 2), store=False, related=)
 
 #class hcs_sudameris(models.Model):
 #	_name = 'hcs_sudameris.hcs_sudameris'
