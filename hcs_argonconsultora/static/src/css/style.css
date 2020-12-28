@@ -1,0 +1,60 @@
+.btn-primary {
+    background-color: #02b2cf !important;
+    border-color: #02b2cf !important;
+}
+
+.btn-primary:hover {
+    background-color: #02b2cf !important;
+    border-color: #02b2cf !important;
+}
+
+.btn-primary:focus, .btn-primary.focus {
+    box-shadow: 0 0 0 0.2rem rgba(2, 178, 207, 0.5) !important;
+}
+
+.btn-primary.disabled, .btn-primary:disabled {
+    background-color: #02b2cf !important;
+    border-color: #02b2cf !important;
+}
+
+.btn-primary:not(:disabled):not(.disabled):active, .btn-primary:not(:disabled):not(.disabled).active, .show > .btn-primary.dropdown-toggle {
+    background-color: #02b2cf !important;
+    border-color: #02b2cf !important;
+}
+
+.btn-primary:not(:disabled):not(.disabled):active:focus, .btn-primary:not(:disabled):not(.disabled).active:focus, .show > .btn-primary.dropdown-toggle:focus {
+    box-shadow: 0 0 0 0.2rem rgba(2, 178, 207, 0.5) !important;
+}
+
+.btn-link {
+    color: #ffff80 !important;
+}
+
+.btn-link:hover {
+    color: #02b2cf !important;
+}
+
+.form-control:focus {
+    border-color: rgba(2, 178, 207, 0.5) !important;
+    box-shadow: 0 0 0 0.2rem rgba(2, 178, 207, 0.5) !important;
+}
+
+a {
+    color: #ffff80 !important;
+}
+
+a:hover {
+    color: #02b2cf !important;
+}
+
+.o_input {
+    border-radius: 20px !important;
+}
+
+.o_kanban_view.o_kanban_ungrouped .o_kanban_record {
+    border-radius: 20px 0 0 0 !important;
+}
+
+.o_kanban_view .o_kanban_record.o_kanban_record_has_image_fill .o_kanban_image_fill_left {
+    border-radius: 20px 0 20px 0 !important;
+}
