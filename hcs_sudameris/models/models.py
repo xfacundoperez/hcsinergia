@@ -21,8 +21,7 @@ class sudameris_employee_salary_movement(models.Model):
   _name = 'hcs_sudameris.sudameris_employee_salary_movement'
   _description = 'Movimientos de salario del empleado'
 
-  empleado = fields.ManyToOne('hr.employee', 'id', 'Empleado')
-
+  empleado = fields.Many2one(string='Empleado', comodel_name='hr.employee')
   # salario_def = fields.Float(string="Salario del empleado", digits=(18, 2), store=False, related=)
 
 #class hcs_sudameris(models.Model):
