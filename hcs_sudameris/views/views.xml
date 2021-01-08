@@ -1,33 +1,46 @@
 <odoo>
   <data>
-    <!-- Añadiendo campos a la vista del empleado -->
-    <record id="sudameris_salary_inherith" model="ir.ui.view">
-      <field name="name">hr.employee.form.sudameris.salary.inherith</field>
+    <!-- Añadiendo campos a la vista Form del empleado -->
+    <record id="sudameris_hr_employee_form" model="ir.ui.view">
+      <field name="name">hr.employee.sudameris.hr.employee.form</field>
       <field name="model">hr.employee</field>
       <field name="inherit_id" ref="hr.view_employee_form" />
       <field name="arch" type="xml">
+        <field name="name" position="replace">
+          <field name="name" placeholder="Nombres" style="margin-right: 10px" required="True" />
+          <field name="apellidos" placeholder="Apellidos" />
+        </field>
         <field name="parent_id" position="after">
-          <field name="salario" />
+          <field name="tipo_moneda" />
+          <field name="salario_bruto" />
         </field>
         <field name="identification_id" position="before">
-          <field name="tdoc" />
-          <field name="vencidoc" />
+          <field name="tipo_documento" />
+          <field name="vencimiento_documento" />
         </field>
+        <!-- Oculto la pagina Work Information -->
+        <xpath expr="//page[@name='public']" position="attributes">
+          <attribute name="invisible">1</attribute>
+        </xpath>
+        <!-- Oculto la pagina RRHH -->
         <xpath expr="//page[@name='hr_settings']" position="attributes">
           <attribute name="invisible">1</attribute>
         </xpath>
+        <!-- Agrego la pagina Sudameris -->
         <xpath expr="//page[@name='hr_settings']" position="after">
           <page name="hr_sudameris" string="Sudameris">
             <group>
                 <group string="Información laboral">
-                    <field name="tpgroup"/>
-                    <field name="ejecutivo"/>
-                    <field name="tpcontrato"/>
-                    <field name="fingreso"/>
+                  <field name="tipo_grupo"/>
+                  <field name="ejecutivo"/>
+                  <field name="tipo_contrato"/>
+                  <field name="fecha_ingreso"/>
+                  <field name="fecha_fin_contrato"/>
                 </group>
                 <group string="Información bancaria">
-                    <field name="ctnro" />
-                    <field name="ctnom"/>
+                    <field name="numero_sucursal" />
+                    <field name="numero_cuenta" />
+                    <field name="nombre_cuenta"/>
                 </group>
             </group>
           </page>
@@ -35,6 +48,17 @@
       </field>
     </record>
 
+    <!-- Agrego apellido a la vista Kanban -->
+    <record id="sudameris_hr_employee_kanban" model="ir.ui.view">
+      <field name="name">hr.employee.sudameris.hr.employee.kanban</field>
+      <field name="model">hr.employee</field>
+      <field name="inherit_id" ref="hr.hr_kanban_view_employees" />
+      <field name="arch" type="xml">
+        <field name="name" position="after">
+          <field name="apellidos" />
+        </field>
+      </field>
+    </record>
 
     <!-- vista tree del modelo movimiento de salarios -->
     <record id="tree_view_sudameris_salary_movement" model="ir.ui.view">
@@ -42,7 +66,14 @@
       <field name="model">sudameris_employee_salary_movement</field>
       <field name="arch" type="xml">
         <tree string="Movimientos de salario">
-          <field name="empleado" />
+          <field name="empleado_nombres" />
+          <field name="empleado_apellidos" />
+          <field name="salario_bruto_def" />
+          <field name="salario_importe" />
+          <field name="fecha_pago" />
+          <field name="modalidad_pago" />
+          <field name="tipo_operacion" />
+          <field name="state" />
         </tree>
       </field>
     </record>
@@ -53,10 +84,33 @@
       <field name="model">sudameris_employee_salary_movement</field>
       <field name="arch" type="xml">
         <form string="Movimientos de salario">
+          <header>
+            <button name="button_aproved" string="Aprobar" confirm="¿Estás seguro que deseas aprobar este registro? Verifique el salario antes de aceptar" states="preliquidacion" class="oe_highlight" groups="hr.group_hr_manager" type="object"/>
+            <button name="button_reset" string="Volver a borrador" confirm="¿Estás seguro que deseas volver este registro a borrador? Verifique el salario antes de aceptar"  states="aprobado" class="oe_highlight"
+                  type="object"/>
+            <field name="state" widget="statusbar" statusbar_visible="preliquidacion,aprobado,enproceso,cancelado,liquidado" statusbar_colors='{"cancelado":"red","aprobado":"blue","liquidado":"green"}'/>
+          </header>
           <sheet>
-            <group>
+            <group string="Información del empleado">
               <field name="empleado" />
+              <field name="identification_id" />
+              <field name="moneda" />
+              <field name="salario_bruto_def" />
             </group>
+            <group string="Información de liquidación">
+              <group>
+                <field name="tipo_cobro" />
+                <field name="salario_importe" />
+                <field name="fecha_pago" />
+                <field name="modalidad_pago" />
+              </group>
+              <group>
+                <field name="tipo_operacion" />
+                <field name="codigo_operacion" />
+                <field name="codigo_suboperacion" />
+                <field name="referencia" placeholder="Número de referencia" />
+              </group>
+            </group> 
           </sheet>
         </form>
       </field>
@@ -69,8 +123,31 @@
       <field name="view_mode">tree,kanban,form</field>
       <field name="help" type="html">
         <p class="o_view_nocontent_smiling_face">
-          Crear un movimiento de Salario!
+          Agregar una nueva liquidación de Salario!
         </p>
+        <p>Todavia no tienes ninguna liquidación, puedes agregar en el botón Crear!</p>
+      </field>
+    </record>
+
+    <record id="action_sudameris_aproved" model="ir.actions.server">
+      <field name="name">Aprobar</field>
+      <field name="model_id" ref="model_sudameris_employee_salary_movement"/>
+      <field name="binding_model_id" ref="model_sudameris_employee_salary_movement"/>
+      <field name="binding_view_types">list</field>
+      <field name="state">code</field>
+      <field name="code">
+        action = records.button_aproved()
+      </field>
+    </record>
+
+    <record id="action_sudameris_send_data" model="ir.actions.server">
+      <field name="name">Generar archivo .TXT</field>
+      <field name="model_id" ref="model_sudameris_employee_salary_movement"/>
+      <field name="binding_model_id" ref="model_sudameris_employee_salary_movement"/>
+      <field name="binding_view_types">list</field>
+      <field name="state">code</field>
+      <field name="code">
+        action = records._create_txt()
       </field>
     </record>
 
@@ -80,55 +157,5 @@
         action="open_view_sudameris_salary_movement"
         parent="hr.menu_hr_employee_payroll"
         sequence="2"/>
-
-    <!-- explicit list view definition
-    <record model="ir.ui.view" id="hcs_sudameris.list">
-      <field name="name">hcs_sudameris_list</field>
-      <field name="model">hcs_sudameris.hcs_sudameris</field>
-      <field name="arch" type="xml">
-        <tree>
-          <field name="name_sudame"/>
-        </tree>
-      </field>
-    </record> -->
-
-    <!-- actions opening views on models 
-    <record model="ir.actions.act_window" id="hcs_sudameris.action_window">
-      <field name="name">hcs_sudameris window</field>
-      <field name="res_model">hcs_sudameris.hcs_sudameris</field>
-      <field name="view_mode">tree,form</field>
-    </record> -->
-
-    <!-- server action to the one above -->
-<!--
-    <record model="ir.actions.server" id="hcs_sudameris.action_server">
-      <field name="name">hcs_sudameris server</field>
-      <field name="model_id" ref="model_hcs_hcs_sudameris_sudameris"/>
-      <field name="state">code</field>
-      <field name="code">
-        action = {
-          "type": "ir.actions.act_window",
-          "view_mode": "tree,form",
-          "res_model": model._name,
-        }
-      </field>
-    </record>
--->
-
-    <!-- Top menu item
-    <menuitem name="hcs_sudameris" id="hcs_sudameris.menu_root"/>
-    -->
-    <!-- menu categories
-    <menuitem name="Menu 1" id="hcs_sudameris.menu_1" parent="hcs_sudameris.menu_root"/>
-    <menuitem name="Menu 2" id="hcs_sudameris.menu_2" parent="hcs_sudameris.menu_root"/>
-    -->
-    <!-- actions
-    <menuitem name="List" id="hcs_sudameris.menu_1_list" parent="hcs_sudameris.menu_1"
-              action="hcs_sudameris.action_window"/>
-              -->
-<!--
-    <menuitem name="Server to list" id="hcs_sudameris" parent="hcs_sudameris.menu_2"
-              action="hcs_sudameris.action_server"/>
--->
   </data>
 </odoo>

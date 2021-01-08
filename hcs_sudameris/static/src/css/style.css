@@ -46,15 +46,3 @@ a {
 a:hover {
     color: #AA0000 !important;
 }
-
-.o_input {
-    border-radius: 20px !important;
-}
-
-.o_kanban_view.o_kanban_ungrouped .o_kanban_record {
-    border-radius: 20px 0 0 0 !important;
-}
-
-.o_kanban_view .o_kanban_record.o_kanban_record_has_image_fill .o_kanban_image_fill_left {
-    border-radius: 20px 0 20px 0 !important;
-}
