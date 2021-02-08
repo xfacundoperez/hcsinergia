@@ -23,6 +23,7 @@
     # always loaded
     'data': [
         'security/ir.model.access.csv',
+        'views/website_templates.xml',
         'views/webclient_templates.xml',
         'views/employee.xml',
         'views/salary_movement.xml',
