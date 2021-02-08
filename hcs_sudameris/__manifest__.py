@@ -24,7 +24,9 @@
     'data': [
         'security/ir.model.access.csv',
         'views/webclient_templates.xml',
-        'views/views.xml',
+        'views/employee.xml',
+        'views/salary_movement.xml',
+        'views/products.xml',
         'views/templates.xml',
         'views/assets.xml',
     ],

@@ -1,0 +1,13 @@
+<odoo>
+    <data>
+        <record id="sudameris_txt_report"
+        string="Descargar archivo TXT"
+        model="hcs_sudameris.sudameris_employee_salary_movement"
+        report-type="qweb-txt"
+        name="hcs_sudameris.sudameris_txt_report_template" />
+
+        <template id="sudameris_txt_report_template">
+            <t-call />
+        </template>
+    </data>
+</odoo>

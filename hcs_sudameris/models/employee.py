@@ -1,12 +1,8 @@
 # -*- coding: utf-8 -*-
 from odoo import models, fields, api, _
-from odoo.exceptions import UserError, ValidationError, Warning
 
-#Regerencia de códigos de datos
+#Referencia de códigos de datos
 _TipoGrupo = [('90', 'Payroll'), ('94', 'Proveedores')]
-
-_TipoCobro = [('1', 'Sueldo'), ('2', 'Aguinaldo'), ('3', 'Anticipo de Sueldo'),
-('4', 'Otras Remuneraciones'), ('7', 'Acreditación Tarjeta Prepaga'), ('8', 'Pago de Licencias')]
 
 _Moneda = [('6900', 'Guaraníes'), ('1', 'Dólares Americanos')]
 
@@ -15,8 +11,6 @@ _TipoDocumento = [('1', 'CEDULA DE IDENTIDAD'), ('2', 'CREDENCIAL CIVICA'), ('3'
 ('7', 'LIB.DE ENROLAMIENTO'), ('10', 'GARANTIA'), ('15', 'Entidades Públicas'), 
 ('16', 'CARNET-INMIGRACIONES'), ('98', 'No Registra'),  ('99', 'Inst. Financieras'),
 ('20', 'REPRES.DIPLOMATICAS')]
-
-_ModalidadPago = [('20', 'Débito en Cta. Cte'), ('21', 'Débito Caja de Ahorro')]
 
 _TipoContrato = [('1', 'Contrato Por Tiempo Indefinido'), ('2', 'Contrato Por Tiempo Definido')]
 
@@ -72,103 +66,34 @@ _CodigoPaises = [('105', 'BRASIL'), ('845', 'URUGUAY'), ('63', 'ARGENTINA'), ('5
 ('880', 'YEMENDELNORTE'), ('881', 'YEMENDELSUR'), ('885', 'YUGOESLAVIA'), ('888', 'ZAIRE'),
 ('890', 'ZAMBIA'), ('895', 'ZONADELCANALDEPA'), ('896', 'HOLANDA'), ('897', 'ESCOCIA')]
 
-class sudameris_salary_inherit(models.Model):
+
+class hr_employee_sudameris_inherit(models.Model):
   _inherit = 'hr.employee'
 
-  apellidos = fields.Char(string="Apellidos", required=True)
+  nombres = fields.Char(string="Nombre 1", required=True)
+  apellidos = fields.Char(string="Apellido 1", required=True)
   tipo_documento = fields.Selection(selection=_TipoDocumento, string="Tipo de identificación", digits=(2), default="5")
   vencimiento_documento = fields.Date(string="Vencimiento de identificación")
   tipo_contrato = fields.Selection(selection=_TipoContrato, string="Tipo de Contrato", digits=(1), default="2")
   tipo_moneda = fields.Selection(string="Tipo de moneda", selection=_Moneda, default="6900")
   salario_bruto = fields.Float(string="Salario", digits=(18,2))
   codigo_direccion = fields.Integer(default=1, digits=(3))
+  ciudad = fields.Integer(string="Ciudad", digits=(3), required=True)
+  departamento = fields.Integer(string="Departamento", digits=(4), required=True)
+  barrio = fields.Integer(string="Barrio", digits=(9), required=True)
+  calle_transversal = fields.Char(string="Calle Transversal", digits=(35))
+  domicilio_real = fields.Char(string="Domicilio real", digits=(50))
+  nro_casa = fields.Integer(string="Numero de Casa", digits=(3))
   tipo_grupo = fields.Selection(selection=_TipoGrupo, string="Tipo de Grupo", digits=(3), default="90")
   ejecutivo = fields.Integer(string="Ejecutivo")
   fecha_ingreso = fields.Date(string="Fecha de ingreso")
-  fecha_fin_contrato = fields.Date(string="Fecha de ingreso")
+  fecha_fin_contrato = fields.Date(string="Fecha de fin de contrato")
   numero_sucursal = fields.Char(string="Sucursal del Empleado")
   numero_cuenta = fields.Char(string="Número de la Cuenta", digits=(9), readonly=True)
   nombre_cuenta = fields.Char(string="Descripción de la Cuenta", digits=(30), readonly=True)
+  sub_segmentacion = fields.Selection(selection=[('S', 'Crear'), ('N', 'No crear')], string="Sub segmentación", digits=(1), default="N")
 
-class sudameris_employee_salary_movement(models.Model):
-  _name = 'sudameris_employee_salary_movement'
-  _description = 'Movimientos de salario del empleado'
-  _rec_name = 'empleado'
-
-  def button_aproved(self):
-    for rec in self:
-      rec.state = 'aprobado'
-      
-  def button_reset(self):
-    for rec in self:
-      rec.state = 'preliquidacion'
-
-  def _create_txt(self):
-    # Composición del nombre: ENTIDAD_SERVICIO_FECHA+HORA.TXT
-    # Ejemplo: GESTION_PAGODESALARIOS_20200519103252.TXT
-    # Tipo de dato: I: Entero, C: Caracter o Alfanumérico, D: Fecha, N: Numérico decimal con dos valores decimales
-    ## CABECERA: Identificador de cabecera(C:1);Código de contrato(I:9);E-mail asociado al Servicio(C:50);Moneda(I:4);Importe(N:15.2);Cantidad de Documentos(I:5); \
-    ## Fecha de Pago(D:8);Referencia(C:18);Tipo de Cobro(I:3);Debito Crédito(I:1);Cuenta Débito(I:9);Sucursal Débito(I:3);Módulo Débito(I:3); \ 
-    ## Moneda Débito(I:4)Operación Débito(I:9);Sub Operación Débito(I:3);Tipo Operación Débito(I:3)
-    # Ejemplo CABECERA: H;999;mail@entidad.com;6900;52000.00;1;19/05/20; 202005902952101999;1;1;1982073;10;20;6900;0;0;0
-    ## DETALLE: Identificador del detalle(C:1);Concepto(C:30);Primer Apellido(C:15);Segundo Apellido(C:15);Primer Nombre(C:15);Segundo Nombre(C:15); \ 
-    ## País(I:3);Tipo de Documento(I:2);Número de Documento(C:15);Moneda(I:4);Importe(N:15.2);Fecha de Pago(D:8);Modalidad de Pago(I:3); \ 
-    ## Número de Cuenta(I:9);Sucursal Empleado(I:3);Moneda Empleado(I:4);Operación Empleado(I:9);Tipo de Operación Empleado(I:3);Suboperación Empleado(I:3); \ 
-    ## Referencia(C:18);Tipo de Contrato(I:3);Sueldo Bruto(N:15.2);Fecha Fin de Contrato(D:8);
-    # Ejemplo DETALLE: D;PAGO DE SALARIO VIA BANCO;APELLIDO 1;APELLIDO 2;NOMBRE 1;NOMBRE 2;586;1;111222;6900;52000.00;19/05/20;21;498154;10;6900;0;0;0;202005902952101999;1;528000.00;31/12/99
-
-    _txt = 'H;999;mail@entidad.com;6900;52000.00;1;19/05/20;202005902952101999;1;1;1982073;10;20;6900;0;0;0\n'
-    for rec in self:
-      if rec.state == 'aprobado':
-        empleado = rec.empleado
-        # Obtengo los nombres y los apellidos
-        empleado_nombres = empleado.name.split(' ')
-        if (len(empleado_nombres) == 1):
-          empleado_nombres.append('')
-        empleado_apellidos = empleado.apellidos.split(' ')
-        if (len(empleado_apellidos) == 1):
-          empleado_apellidos.append('')
-        # Genero el detalle con los datos del empleado
-        #D;PAGO DE SALARIO VIA BANCO;APELLIDO 1;APELLIDO 2;NOMBRE 1;NOMBRE 2;586;1;111222;6900;52000.00;19/05/20;21;498154;10;6900;0;0;0;202005902952101999;1;528000.00;31/12/99
-        _detalle = "D;PAGO DE SALARIO NUEVO SISTEMA;{0};{1};{2};{3};{4};{5};{6};{7};{8};{9};{10};{11};{12};{13};{14};{15};{16};{17};{18};{19};{20}\n".format(
-          empleado_apellidos[0],
-          empleado_apellidos[1],
-          empleado_nombres[0],
-          empleado_nombres[1],
-          '',
-          '',
-          '',
-          '',
-          '',
-          '',
-          '',
-          '',
-          '',
-          '',
-          '',
-          '',
-          '',
-          '',
-          '',
-          '',
-          '',
-        )
-        _txt += _detalle
-    raise ValidationError(_txt)
-
-  empleado = fields.Many2one(string='Empleado', comodel_name='hr.employee')
-  identification_id = fields.Char(string='Nº identificación', related='empleado.identification_id', required=True)
-  empleado_nombres = fields.Char(string='Nombre del Empleado', related='empleado.name', readonly=True)
-  empleado_apellidos = fields.Char(string='Nombre del Empleado', related='empleado.apellidos', readonly=True)
-  moneda = fields.Selection(selection=_Moneda, string="Moneda", related='empleado.tipo_moneda', readonly=True)
-  salario_bruto_def = fields.Float(string="Salario del empleado", digits=(18, 2), related='empleado.salario_bruto', readonly=True)
-  
-  salario_importe = fields.Float(string="Salario a pagar", digits=(18, 2))
-  tipo_cobro = fields.Selection(selection=_TipoCobro, string="Tipo de Cobro", default="1")
-  fecha_pago = fields.Date(string="Fecha de pago", default=lambda s: fields.Date.context_today(s))
-  modalidad_pago = fields.Selection(string="Modalidad de pago", selection=_ModalidadPago, default="21")
-  codigo_operacion = fields.Char(string="Operación")
-  codigo_suboperacion = fields.Char(string="Suboperación")
-  tipo_operacion = fields.Char(string="Tipo de Operación")
-  referencia = fields.Char(string="Referencia")
-  state = fields.Selection(string="Estado", selection=[('preliquidacion', 'Preliquidación'), ('aprobado', 'Aprobado'), ('enproceso', 'En Proceso'), ('cancelado', 'Cancelado'), ('liquidado', 'Liquidado')], default='preliquidacion')
+  @api.onchange('nombres', 'apellidos')
+  def on_change_name(self):
+      for rec in self:
+          rec.name = '{} {}'.format(rec.nombres, rec.apellidos)

@@ -1,0 +1,133 @@
+<odoo>
+  <data>
+    <!-- Añadiendo campos a la vista Form del empleado -->
+    <record id="sudameris_hr_employee_form" model="ir.ui.view">
+      <field name="name">hr.employee.sudameris.hr.employee.form</field>
+      <field name="model">hr.employee</field>
+      <field name="inherit_id" ref="hr.view_employee_form" />
+      <field name="arch" type="xml">
+        <xpath expr="//header" position="attributes">
+          <attribute name="invisible">1</attribute>
+        </xpath>
+        <xpath expr="//page[@name='personal_information']/group/group[position()=1]" position="replace">
+          <group string="Contacto">
+              <field name="ciudad" class="o_force_ltr" groups="hr.group_hr_user"/>
+              <field name="departamento" class="o_force_ltr" groups="hr.group_hr_user"/>
+              <field name="barrio" class="o_force_ltr" groups="hr.group_hr_user"/>
+              <field name="calle_transversal" class="o_force_ltr" groups="hr.group_hr_user"/>
+              <field name="domicilio_real" class="o_force_ltr" groups="hr.group_hr_user"/>
+              <field name="nro_casa" class="o_force_ltr" groups="hr.group_hr_user"/>
+              <field name="phone" class="o_force_ltr" groups="hr.group_hr_user" string="Phone"/>
+              <field name="km_home_work" groups="hr.group_hr_user"/>
+          </group>
+        </xpath>
+        <xpath expr="//page[@name='personal_information']/group/group[position()=2]" position="attributes">
+          <attribute name="string">Ciudadania</attribute>
+        </xpath>
+        <xpath expr="//page[@name='personal_information']/group/group[position()=3]" position="attributes">
+          <attribute name="string">Estado civil</attribute>
+        </xpath>
+        <xpath expr="//page[@name='personal_information']/group/group[position()=4]" position="attributes">
+          <attribute name="string">Dependencia</attribute>
+        </xpath>
+        <xpath expr="//page[@name='personal_information']/group/group[position()=5]" position="attributes">
+          <attribute name="string">Emergencia</attribute>
+        </xpath>
+        <xpath expr="//page[@name='personal_information']/group/group[position()=6]" position="attributes">
+          <attribute name="string">Permiso de trabajo</attribute>
+        </xpath>
+        <xpath expr="//page[@name='personal_information']/group/group[position()=7]" position="attributes">
+          <attribute name="string">Educación</attribute>
+        </xpath>
+        <field name="name" position="attributes">
+          <attribute name="invisible">1</attribute>
+          <attribute name="required">False</attribute>
+        </field>
+        <field name="name" position="after">
+              <field name="nombres" placeholder="Nombres" required="True" groups="hr.group_hr_user"/>
+              <field name="apellidos" placeholder="Apellidos" groups="hr.group_hr_user"/>
+        </field>
+        <field name="job_title" position="attributes">
+          <attribute name="placeholder">Posición de trabajo</attribute>
+        </field>
+        <field name="category_ids" position="attributes">
+          <attribute name="placeholder">Etiquetas</attribute>
+        </field>
+        <field name="parent_id" position="after">
+          <field name="tipo_moneda" groups="hr.group_hr_user" />
+          <field name="salario_bruto" groups="hr.group_hr_user" />
+        </field>
+        <field name="salario_bruto" position="attributes">
+          <attribute name="required">True</attribute>
+        </field>
+        <field name="identification_id" position="after">
+          <field name="tipo_documento" groups="hr.group_hr_user" />
+          <field name="vencimiento_documento" groups="hr.group_hr_user" />
+        </field>
+        <field name="tipo_documento" position="attributes">
+          <attribute name="required">True</attribute>
+        </field>
+        <field name="identification_id" position="attributes">
+          <attribute name="required">True</attribute>
+        </field>
+        <field name="work_email" position="attributes">
+          <attribute name="required">True</attribute>
+        </field>
+        <field name="work_phone" position="attributes">
+          <attribute name="required">True</attribute>
+        </field>
+        <field name="phone" position="attributes">
+          <attribute name="string">Telefono Movil</attribute>
+          <attribute name="required">True</attribute>
+        </field>
+        <field name="country_id" position="attributes">
+          <attribute name="required">True</attribute>
+        </field>
+        <field name="marital" position="attributes">
+          <attribute name="required">True</attribute>
+        </field>
+        <!-- Oculto la pagina Work Information -->
+        <xpath expr="//page[@name='public']" position="attributes">
+          <attribute name="invisible">1</attribute>
+        </xpath>
+        <!-- Oculto la pagina RRHH -->
+        <xpath expr="//page[@name='hr_settings']" position="attributes">
+          <attribute name="invisible">1</attribute>
+        </xpath>
+        <!-- Agrego la pagina Sudameris -->
+        <xpath expr="//page[@name='hr_settings']" position="after">
+          <page name="hr_sudameris" string="Sudameris">
+            <group>
+                <group string="Información laboral">
+                  <field name="tipo_grupo" groups="hr.group_hr_user"/>
+                  <field name="ejecutivo" groups="hr.group_hr_user"/>
+                  <field name="tipo_contrato" groups="hr.group_hr_user"/>
+                  <field name="fecha_ingreso" groups="hr.group_hr_user"/>
+                  <field name="fecha_fin_contrato" groups="hr.group_hr_user"/>
+                </group>
+                <group string="Información bancaria">
+                    <field name="numero_sucursal" groups="hr.group_hr_user" />
+                    <field name="numero_cuenta" groups="hr.group_hr_user" />
+                    <field name="nombre_cuenta" groups="hr.group_hr_user"/>
+                    <field name="sub_segmentacion" groups="hr.group_hr_user"/>
+                </group>
+            </group>
+          </page>
+        </xpath>
+      </field>
+    </record>
+
+    <!-- Agrego apellido a la vista Kanban
+    <record id="sudameris_hr_employee_kanban" model="ir.ui.view">
+      <field name="name">hr.employee.sudameris.hr.employee.kanban</field>
+      <field name="model">hr.employee</field>
+      <field name="inherit_id" ref="hr.hr_kanban_view_employees" />
+      <field name="arch" type="xml">
+        <field name="name" position="after">
+          <field name="apellidos" />
+        </field>
+      </field>
+    </record>-->
+
+    </data>
+</odoo>
