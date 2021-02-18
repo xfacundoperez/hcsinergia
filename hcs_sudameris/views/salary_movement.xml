@@ -8,6 +8,8 @@
         <tree string="Movimientos de salario">
           <!-- <field name="empleado_nombres" />
           <field name="empleado_apellidos" /> -->
+          <field name="empleado" />
+          <field name="identification_id" />
           <field name="salario_bruto_def" />
           <field name="salario_importe" />
           <field name="fecha_pago" />
@@ -67,6 +69,29 @@
           <filter string="Pagos del mes" name="fecha_pago_filter" domain="['&amp;',('fecha_pago', '&gt;=', (context_today() + relativedelta(weeks=-1,days=1,weekday=0)).strftime('%Y-%m-%d')),('fecha_pago', '&lt;=', (context_today() + relativedelta(day=31)).strftime('%Y-%m-%d'))]" />
         </search>
       </field>
+    </record>
+
+    <record id="view_sudameris_employee_salary_movement_wizard_form" model="ir.ui.view">
+      <field name="name">sudameris_employee_salary_movement.wizard.form</field>
+      <field name="model">sudameris_employee_salary_movement.wizard</field>
+      <field name="arch" type="xml">
+          <form string="Alert form">
+              <group col="2" colspan="4">
+                  <field name="message" nolabel="1"/>
+              </group>
+              <footer>
+                <button string="Cerrar" class="oe_highlight" special="cancel" />
+              </footer>
+          </form>
+      </field>
+    </record>
+   
+    <record id="action_sudameris_employee_salary_movement_wizard" model="ir.actions.act_window">
+      <field name="name">Mensaje</field>
+      <field name="type">ir.actions.act_window</field>
+      <field name="res_model">sudameris_employee_salary_movement.wizard</field>
+      <field name="view_mode">form</field>
+      <field name="domain">[]</field>
     </record>
 
     <record id="open_view_sudameris_salary_movement" model="ir.actions.act_window">

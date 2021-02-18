@@ -6,8 +6,17 @@
       <field name="model">hr.employee</field>
       <field name="inherit_id" ref="hr.view_employee_form" />
       <field name="arch" type="xml">
-        <xpath expr="//header" position="attributes">
-          <attribute name="invisible">1</attribute>
+        <xpath expr="//header" position="replace">
+          <header>
+            <button name="btn_aprobar" string="Aprobar" confirm="¿Estás seguro que deseas aprobar este registro? El empleado quedará a espera de alta de cuenta" states="borrador" class="oe_highlight" groups="hr.group_hr_manager" type="object" />
+            <button name="btn_borrador" string="Volver a borrador" confirm="¿Estás seguro que deseas volver este registro a borrador?" states="enproceso" class="oe_highlight" type="object" />
+            <button name="btn_reiniciar" string="Reiniciar" confirm="¿Estás seguro que deseas volver este registro a En Proceso?" states="listo" class="oe_highlight" type="object" />            
+            <field name="state" widget="statusbar" statusbar_visible="borrador,enproceso,listo" statusbar_colors='{"borrador":"red","enproceso":"blue","listo":"green"}' />  
+          </header>
+          <!--<header>
+            <attribute name="invisible">0</attribute>
+            <button name="%{hcs_sudameris.cliente_posee_cuenta_wizzard}d" string="Cliente posee cuenta" type="action" class="oe_highlight" />
+          </header> -->
         </xpath>
         <xpath expr="//page[@name='personal_information']/group/group[position()=1]" position="replace">
           <group string="Contacto">
@@ -40,12 +49,16 @@
           <attribute name="string">Educación</attribute>
         </xpath>
         <field name="name" position="attributes">
+          <attribute name="class">oe_read_only</attribute>
+          <attribute name="required">False</attribute>
+          <!--          
           <attribute name="invisible">1</attribute>
           <attribute name="required">False</attribute>
+            -->
         </field>
         <field name="name" position="after">
-              <field name="nombres" placeholder="Nombres" required="True" groups="hr.group_hr_user"/>
-              <field name="apellidos" placeholder="Apellidos" groups="hr.group_hr_user"/>
+          <field name="nombres" class="oe_edit_only" placeholder="Nombres" groups="hr.group_hr_user" />
+          <field name="apellidos" class="oe_edit_only" placeholder="Apellidos" groups="hr.group_hr_user" />
         </field>
         <field name="job_title" position="attributes">
           <attribute name="placeholder">Posición de trabajo</attribute>
@@ -78,7 +91,6 @@
         </field>
         <field name="phone" position="attributes">
           <attribute name="string">Telefono Movil</attribute>
-          <attribute name="required">True</attribute>
         </field>
         <field name="country_id" position="attributes">
           <attribute name="required">True</attribute>
@@ -110,6 +122,7 @@
                     <field name="numero_cuenta" groups="hr.group_hr_user" />
                     <field name="nombre_cuenta" groups="hr.group_hr_user"/>
                     <field name="sub_segmentacion" groups="hr.group_hr_user"/>
+                    <field name="wk" groups="hr.group_hr_user" domain="[('tipo', '=', 'kit')]" widget="selection"/>
                 </group>
             </group>
           </page>
@@ -117,17 +130,61 @@
       </field>
     </record>
 
-    <!-- Agrego apellido a la vista Kanban
-    <record id="sudameris_hr_employee_kanban" model="ir.ui.view">
-      <field name="name">hr.employee.sudameris.hr.employee.kanban</field>
-      <field name="model">hr.employee</field>
-      <field name="inherit_id" ref="hr.hr_kanban_view_employees" />
+    <record id="view_hr_wizard_form" model="ir.ui.view">
+      <field name="name">hr.employee.wizard.form</field>
+      <field name="model">hr.employee.wizard</field>
       <field name="arch" type="xml">
-        <field name="name" position="after">
-          <field name="apellidos" />
-        </field>
+          <form string="Alert form">
+              <group col="2" colspan="4">
+                  <field name="message" nolabel="1"/>
+              </group>
+              <footer>
+                <button string="Cerrar" class="oe_highlight" special="cancel" />
+              </footer>
+          </form>
       </field>
-    </record>-->
+    </record>
+   
+    <record id="action_hr_wizard" model="ir.actions.act_window">
+      <field name="name">Mensaje</field>
+      <field name="type">ir.actions.act_window</field>
+      <field name="res_model">hr.employee.wizard</field>
+      <field name="view_mode">form</field>
+      <field name="domain">[]</field>
+    </record>
+
+    <record id="action_sudameris_cliente_posee_cuenta" model="ir.actions.server">
+      <field name="name">Cliente posee cuenta</field>
+      <field name="model_id" ref="model_hr_employee" />
+      <field name="binding_model_id" ref="model_hr_employee" />
+      <field name="binding_view_types">list,form</field>
+      <field name="state">code</field>
+      <field name="code">
+        action = record.cliente_posee_cuenta()
+      </field>
+    </record>
+
+    <record id="action_sudameris_employee_crear_movimientos" model="ir.actions.server">
+      <field name="name">Crear movimientos</field>
+      <field name="model_id" ref="model_hr_employee" />
+      <field name="binding_model_id" ref="model_hr_employee" />
+      <field name="binding_view_types">list</field>
+      <field name="state">code</field>
+      <field name="code">
+        action = record.crear_movimientos()
+      </field>
+    </record>
+
+    <record id="action_sudameris_employee_aprobar" model="ir.actions.server">
+      <field name="name">Aprobar</field>
+      <field name="model_id" ref="model_hr_employee" />
+      <field name="binding_model_id" ref="model_hr_employee" />
+      <field name="binding_view_types">list</field>
+      <field name="state">code</field>
+      <field name="code">
+        action = record.btn_aprobar()
+      </field>
+    </record>
 
     </data>
 </odoo>

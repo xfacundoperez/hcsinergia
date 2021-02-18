@@ -15,6 +15,11 @@ _ModalidadPago = [('20', 'Débito en Cta. Cte'), ('21', 'Débito Caja de Ahorro'
 
 _EstadoMovimiento = [('preliquidacion', 'Preliquidación'), ('aprobado', 'Aprobado'), ('enproceso', 'En Proceso'), ('cancelado', 'Cancelado'), ('liquidado', 'Liquidado')]
 
+class sudameris_employee_salary_movement_wizard(models.TransientModel):
+  _name = "sudameris_employee_salary_movement.wizard"
+  _description = "Sudameris Employee Salary Movement wizard"
+  message = fields.Text(readonly=True, store=False)
+
 
 class sudameris_employee_salary_movement(models.Model):
   _name = 'sudameris_employee_salary_movement'
@@ -34,6 +39,17 @@ class sudameris_employee_salary_movement(models.Model):
   tipo_operacion = fields.Char(string="Tipo de Operación")
   referencia = fields.Char(string="Referencia")
   state = fields.Selection(string="Estado", selection=_EstadoMovimiento, default='preliquidacion')
+
+  def show_message(self, title, message):
+    return {
+      'name': title,
+      'type': 'ir.actions.act_window',
+      'res_model': 'sudameris_employee_salary_movement.wizard',
+      'view_mode': 'form',
+      'view_type': 'form',
+      'context': {'default_message': message},
+      'target': 'new'
+    }
 
   def btn_aprobar(self):
     for rec in self:
@@ -66,47 +82,14 @@ class sudameris_employee_salary_movement(models.Model):
     return sudameris_auth
 
   def generar_pago(self):
-    # Composición del nombre: ENTIDAD_SERVICIO_FECHA+HORA.TXT
-    # Ejemplo: GESTION_PAGODESALARIOS_20200519103252.TXT
-    # Tipo de dato: I: Entero, C: Caracter o Alfanumérico, D: Fecha, N: Numérico decimal con dos valores decimales
-    ## CABECERA: Identificador de cabecera(C:1);Código de contrato(I:9);E-mail asociado al Servicio(C:50);Moneda(I:4);Importe(N:15.2);Cantidad de Documentos(I:5); \
-    ## Fecha de Pago(D:8);Referencia(C:18);Tipo de Cobro(I:3);Debito Crédito(I:1);Cuenta Débito(I:9);Sucursal Débito(I:3);Módulo Débito(I:3); \ 
-    ## Moneda Débito(I:4)Operación Débito(I:9);Sub Operación Débito(I:3);Tipo Operación Débito(I:3)
-    # Ejemplo CABECERA: H;999;mail@entidad.com;6900;52000.00;1;19/05/20; 202005902952101999;1;1;1982073;10;20;6900;0;0;0
-    ## DETALLE: Identificador del detalle(C:1);Concepto(C:30);Primer Apellido(C:15);Segundo Apellido(C:15);Primer Nombre(C:15);Segundo Nombre(C:15); \ 
-    ## País(I:3);Tipo de Documento(I:2);Número de Documento(C:15);Moneda(I:4);Importe(N:15.2);Fecha de Pago(D:8);Modalidad de Pago(I:3); \ 
-    ## Número de Cuenta(I:9);Sucursal Empleado(I:3);Moneda Empleado(I:4);Operación Empleado(I:9);Tipo de Operación Empleado(I:3);Suboperación Empleado(I:3); \ 
-    ## Referencia(C:18);Tipo de Contrato(I:3);Sueldo Bruto(N:15.2);Fecha Fin de Contrato(D:8);
-    # Ejemplo DETALLE: D;PAGO DE SALARIO VIA BANCO;APELLIDO 1;APELLIDO 2;NOMBRE 1;NOMBRE 2;586;1;111222;6900;52000.00;19/05/20;21;498154;10;6900;0;0;0;202005902952101999;1;528000.00;31/12/99
-    # _txt = 'Token: {}\n'.format(get_token)
-    _txt_title = 'SUDAMERIS_ODOO_{}.txt'.format(datetime.strftime(datetime.now(), '%Y%m%d%H%M%S'))
-    _txt_content = 'H;999;mail@entidad.com;6900;52000.00;1;19/05/20;202005902952101999;1;1;1982073;10;20;6900;0;0;0\n'
-    for rec in self:
+    # Obtengo los movimientos seleccionados
+    movimientos = self.env['sudameris_employee_salary_movement'].browse(self._context.get('active_ids'))
+    _ids = []
+    for rec in movimientos:
       if rec.state == 'aprobado':
-        empleado = rec.empleado
-        # Obtengo los nombres
-        _nombres = empleado.nombres.split(' ')
-        # Si solo tiene 1 nombre, agrego un string vacio
-        if len(empleado_nombres) == 1:
-          _nombres.append('')
-        # Obtengo los apellidos
-        _apellidos = empleado.apellidos.split(' ')
-        # Si solo tiene 1 apellido, agrego un string vacio
-        if len(empleado_apellidos) == 1:
-          _apellidos.append('')
-        # Genero el detalle con los datos del empleado
-        #D;PAGO DE SALARIO VIA BANCO;APELLIDO 1;APELLIDO 2;NOMBRE 1;NOMBRE 2;586;1;111222;6900;52000.00;19/05/20;21;498154;10;6900;0;0;0;202005902952101999;1;528000.00;31/12/99
-        _detalle = "D;PAGO DE SALARIO NUEVO SISTEMA;{0};{1};{2};{3};{4};{5};{6};{7};{8};{9};{10};{11};{12};{13};{14};{15};{16};{17};{18};{19};{20}\n".format(
-          _apellidos[0], _apellidos[1], _nombres[0], _nombres[1],
-          empleado.country_id.name, empleado.tipo_documento, empleado.identification_id,
-          rec.moneda, rec.salario_importe, rec.fecha_pago, rec.modalidad_pago, empleado.numero_cuenta,
-          empleado.numero_sucursal, empleado.tipo_moneda, rec.codigo_operacion, rec.tipo_operacion,
-          rec.codigo_suboperacion, rec.referencia, empleado.tipo_contrato,
-          empleado.salario_bruto, empleado.fecha_fin_contrato,
-        )
-        _txt_content += _detalle
-    raise ValidationError([_txt_title, ': ', _txt_content])
-    # return self.env.ref(_txt_title).report_action(self, data=_txt_content, config=False)
-    # self.env.ref(_txt_title).report_action(self, data=_txt_content)
-    # with open("/tmp/{}".format(_txt_title), "w") as file:
-    #  file.write(_txt_content)
+        _ids.append('{}'.format(rec.id))
+    return {
+      'type': 'ir.actions.act_url',
+      'url': '/web/binary_text/crear_txt?ids={}'.format(','.join(_ids)),
+      'target': 'self'
+    }

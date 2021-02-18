@@ -1,5 +1,11 @@
 # -*- coding: utf-8 -*-
 from odoo import models, fields, api, _
+from odoo.exceptions import ValidationError
+from .sudameris_api import SudamerisApi
+from datetime import datetime
+import logging, json
+
+_logger = logging.getLogger(__name__)
 
 #Referencia de códigos de datos
 _TipoGrupo = [('90', 'Payroll'), ('94', 'Proveedores')]
@@ -14,62 +20,113 @@ _TipoDocumento = [('1', 'CEDULA DE IDENTIDAD'), ('2', 'CREDENCIAL CIVICA'), ('3'
 
 _TipoContrato = [('1', 'Contrato Por Tiempo Indefinido'), ('2', 'Contrato Por Tiempo Definido')]
 
-_CodigoPaises = [('105', 'BRASIL'), ('845', 'URUGUAY'), ('63', 'ARGENTINA'), ('586', 'PARAGUAY'),
-('589', 'PERU'), ('13', 'AFGANISTAN'), ('17', 'ALBANIA'), ('20', 'ALBORANYPEREJIL,I'),
-('23', 'ALEMANIA'), ('31', 'ALTOVOLTA'), ('37', 'ANDORRA'), ('39', 'AUSTRALIA'),
-('40', 'ANGOLA'), ('43', 'ANTIGUA,ISLA'), ('47', 'ANTILLASHOLANDESAS'),
-('53', 'ARABIASAUDITA'), ('59', 'ARGELIA'), ('69', 'AUSTRALIA'), ('72', 'AUSTRIA'),
-('77', 'BAHAMAS,ISLAS'), ('80', 'BAHREIN'), ('81', 'BANGLADESH'), ('83', 'BARBADOS'),
-('85', 'TOKELAN,ISLAS'), ('87', 'BELGICA-LUXEMBURGO'), ('88', 'BELICE'), ('90', 'BERMUDAS'),
-('93', 'BIRMANIA'), ('97', 'BOLIVIA'), ('101', 'BOTSWANA'), ('108', 'BRUNEI'),
-('111', 'BULGARIA'), ('115', 'BURUNDI'), ('119', 'BUTAN'), ('127', 'CABOVERDE,RCA.DE'),
-('137', 'CAIMAN,ISLAS'), ('141', 'CAMBOYA'), ('145', 'CAMERUM'), ('149', 'CANADA'),
-('153', 'CANARIAS,ISLAS'), ('159', 'CIUDADDELVATICANO'), ('165', 'COCOS,ISLAS'), ('169', 'COLOMBIA'),
-('173', 'COMORAS'), ('177', 'CONGO'), ('183', 'COOK,ISLAS'), ('187', 'COREADELNORTE'),
-('190', 'COREADELSUR'), ('193', 'COSTADEMARFIL'), ('196', 'COSTARICA'), ('199', 'CUBA'),
-('203', 'CHAD'), ('207', 'CHECOSLOVAQUIA'), ('211', 'CHILE'), ('215', 'CHINA'),
-('218', 'TAIWAN'), ('221', 'CHIPRE'), ('229', 'DENIN'), ('232', 'DINAMARCA'),
-('235', 'DOMINICA,ISLA'), ('239', 'ECUADOR'), ('240', 'EGIPTO'), ('242', 'ELSALVADOR'),
-('244', 'EMIRATOSARABESUNID'), ('245', 'ESPAÑA'), ('249', 'ESTADOSUNIDOS'), ('253', 'ETIOPIA'),
-('259', 'FEROE,ISLAS'), ('267', 'FILIPINAS'), ('271', 'FINLANDIA'), ('275', 'FRANCIA'),
-('281', 'GABON'), ('285', 'GAMBIA'), ('289', 'GHANA'), ('293', 'GIBRALTAR'),
-('297', 'GRENADA'), ('301', 'GRECIA'), ('305', 'GROENLANDIA'), ('309', 'GUADALUPEYDEPENDEN'),
-('313', 'GUAM'), ('317', 'GUATEMALA'), ('325', 'GUAYANAFRANCESA'), ('329', 'GUINEA'),
-('331', 'GUINEAECUATORIAL'), ('334', 'GUINEABISSAU'), ('337', 'GUYANA'), ('341', 'HAITI'),
-('345', 'HONDURAS'), ('351', 'HONGKONG'), ('355', 'HUNGRIA'), ('361', 'INDIA'),
-('365', 'INDONESIA'), ('369', 'IRAK'), ('372', 'IRAN'), ('375', 'IRLANDA-EIRE-'),
-('379', 'ISLANDIA'), ('383', 'ISRAEL'), ('386', 'ITALIA'), ('391', 'JAMAICA'),
-('399', 'JAPON'), ('403', 'JORDANIA'), ('410', 'KENIA'), ('413', 'KUWAIT'),
-('420', 'LAOS'), ('426', 'LESOTHO'), ('431', 'LIBANO'), ('434', 'LIBERIA'),
-('438', 'LIBIA'), ('445', 'LUXEMBURGO'), ('447', 'MACAO'), ('450', 'MADAGASCAR'),
-('455', 'MALASIA'), ('458', 'MALAWI'), ('461', 'MALDIVAS'), ('464', 'MALI'),
-('467', 'MALTA'), ('474', 'MARRUECOS'), ('477', 'MARTINICA'), ('485', 'MAURICIO'),
-('488', 'MAURITANIA'), ('493', 'MEXICO'), ('497', 'MONGOLIAREP.POPULAR'), ('501', 'MONTSERRAT,ISLA'),
-('504', 'MOYOTTE'), ('505', 'MOZAMBIQUE'), ('508', 'NAURU'), ('511', 'NAVIDAD,ISLAS'),
-('517', 'NEPAL'), ('521', 'NICARAGUA'), ('525', 'NIGER'), ('528', 'NIGERIA'),
-('531', 'NIUE,ISLA'), ('535', 'NORFOLK,ISLA'), ('538', 'NORUEGA'), ('542', 'NUEVACALEDONIA'),
-('545', 'PAPUANUEVAGUINEA'), ('548', 'NUEVAZELANDIA'), ('551', 'NUEVASHEBRIDAS'), ('556', 'OMAN'),
-('563', 'PACIFICO,ISLAS-ADMIN'), ('566', 'PACIFICO,ISLAS-POSES'), ('569', 'PACIFICO,ISLAS-FIDEI'), ('573', 'HOLANDA'),
-('576', 'PAKISTAN'), ('580', 'PANAMA'), ('593', 'PITCAIRN,ISLA'), ('599', 'POLINESIAFRANCESA'),
-('603', 'POLONIA'), ('607', 'PORTUGAL'), ('611', 'PUERTORICO'), ('618', 'QATAR'),
-('628', 'REINOUNIDO'), ('640', 'REPUBLICACENTROAFRI'), ('647', 'REPUBLICADOMINICANA'), ('660', 'REUNION,ISLA'),
-('665', 'RODESIA'), ('670', 'RUMANIA'), ('675', 'RWANDA'), ('690', 'SAMOAOCCIDENTAL,EDO'),
-('695', 'S.CRISTOBALNEVISY'), ('700', 'SANPEDROYMIQUELON'), ('705', 'SANVICENTE,ISLA'), ('710', 'SANTAELENA'),
-('715', 'SANTALUCIA,ISLA'), ('720', 'SANTOTOMEYPRINCIP'), ('728', 'SENEGAL'), ('731', 'SEYCHELLES'),
-('735', 'SIERRALEONA'), ('741', 'SINGAPUR'), ('744', 'SIRIA'), ('748', 'SOMALIA'),
-('750', 'SRILANKA'), ('756', 'SUDAFRICAYNAMIBIA'), ('759', 'SUDAN'), ('764', 'SUECIA'),
-('767', 'SUIZA'), ('770', 'SURINAM'), ('776', 'TAILANDIA'), ('780', 'TANZANIA'),
-('783', 'DJIBOUTI'), ('785', 'TERRIT.ALTACOMIS.PA'), ('800', 'TOGO'), ('810', 'REINODETONGA'),
-('815', 'TRINIDADYTOBAGO'), ('820', 'TUNEZ'), ('823', 'TURCASYCAICOS,ISLA'), ('827', 'TURQUIA'),
-('833', 'UGANDA'), ('840', 'U.R.S.S.'), ('850', 'VENEZUELA'), ('855', 'VIETNAM'),
-('863', 'VIRGENES,ISLAS-BRITA'), ('866', 'VISGENES,ISLAS-U.S.A'), ('870', 'FIDJI,ISLAS'), ('875', 'WALLISYFUTUNA,ISL'),
-('880', 'YEMENDELNORTE'), ('881', 'YEMENDELSUR'), ('885', 'YUGOESLAVIA'), ('888', 'ZAIRE'),
-('890', 'ZAMBIA'), ('895', 'ZONADELCANALDEPA'), ('896', 'HOLANDA'), ('897', 'ESCOCIA')]
+_EstadoEmpleado = [('borrador', 'Borrador'), ('enproceso', 'En proceso de alta'), ('listo', 'Listo')]
 
+
+class hr_employee_wizard(models.TransientModel):
+  _name = "hr.employee.wizard"
+  _description = "HR employee wizard"
+  message = fields.Text(readonly=True, store=False)
 
 class hr_employee_sudameris_inherit(models.Model):
   _inherit = 'hr.employee'
+  
+  @api.onchange('nombres', 'apellidos')
+  def on_change_name(self):
+    for rec in self:
+      rec.name = '{} {}'.format(rec.nombres, rec.apellidos)
+        
+  def btn_aprobar(self):
+    for rec in self:
+      rec.state = 'enproceso'
+      
+  def btn_borrador(self):
+    for rec in self:
+      rec.state = 'borrador'
 
+  def btn_reiniciar(self):
+    for rec in self:
+      rec.numero_cuenta = None
+      rec.numero_sucursal = None
+      rec.nombre_cuenta = None
+      rec.state = 'enproceso'
+      
+  def show_message(self, title, message):
+    return {
+      'name': title,
+      'type': 'ir.actions.act_window',
+      'res_model': 'hr.employee.wizard',
+      'view_mode': 'form',
+      'view_type': 'form',
+      'context': {'default_message': message},
+      'target': 'new'
+    }
+
+  @api.onchange('salario_bruto')
+  def compute_wk(self):
+    if self.state != 'listo': # Solo si el empleado no está listo, obtengo los kits y le asigno el kit minimo
+      for kit in self.env['sudameris_employee_products'].search([('tipo', '=', 'kit')], order='salario_minimo desc'):
+        if self.salario_bruto >= kit.salario_minimo:
+          self._origin.wk = kit.id
+          break
+        
+  def crear_movimientos(self):
+    _changes = []
+    # Obtengo el context de movimientos de salarios
+    movimientos = self.env['sudameris_employee_salary_movement']
+    # Obtengo los empleados seleccionados
+    empleados = self.env['hr.employee'].browse(self._context.get('active_ids'))
+    for rec in empleados:
+      _create = True
+      if rec.state == 'listo':
+        list_movimientos = movimientos.search([('empleado.id', '=', rec.id)])
+        for movimiento in list_movimientos:
+          if datetime.now().month == movimiento.fecha_pago.month:
+            _changes.append('[ATENCION]: {} ya tiene un movimiento creado para el mes actual'.format(rec.name))
+            _create = False
+        # Si no hay un registro, lo crea
+        if _create:
+          movimientos.create({
+            'empleado': rec.id,
+            'salario_bruto_def': rec.salario_bruto,
+          })
+          _changes.append('[OK]: Se creó el movimiento de {}'.format(rec.name))
+      else:
+        _changes.append('[ATENCION]: {} no está listo para crear movimiento de salario'.format(rec.name))
+    return self.show_message('Crear movimiento de salarios', '\n'.join(_changes))
+
+      
+  def cliente_posee_cuenta(self):
+    _changes = []
+    # Creo la clase y le paso como parametro ir.config_parameter como sudo      
+    sudamerisApi = SudamerisApi(self.env['ir.config_parameter'].sudo())
+    # Obtengo los empleados seleccionados
+    empleados = self.env['hr.employee'].browse(self._context.get('active_ids'))
+    # Por cada empleado seleccionado
+    for rec in empleados:
+      if rec.state == 'borrador':
+        _changes.append('[ERROR]: {} debe estar En Proceso de Alta'.format(rec.name))      
+        continue
+      if rec.state == 'listo' and rec.numero_cuenta != '':
+        _changes.append('[ATENCION]: {} ya posee una cuenta en el banco'.format(rec.name))
+        continue
+      else:
+        # Hago la consulta a la API
+        result = sudamerisApi.ws_cliente_posee_cuenta(rec.country_id.name, rec.tipo_documento, rec.identification_id)
+        for res in result:
+          _valor = res["Filas"]["RepFilas.Fila"][0]["Valor"]
+          if res['Descripcion'] == "CTNRO": # Número de cuenta
+            rec.numero_cuenta = _valor
+          if res['Descripcion'] == "Cttfir": # Sucursal
+            rec.numero_sucursal = 1
+          if res['Descripcion'] == "Observacion": # Descripción de la cuenta
+            rec.nombre_cuenta = _valor
+        # Guardo la respuestas correspondientes y marco el empleado como listo        
+        rec.state = 'listo'
+        _changes.append('[OK]: {} obtuvo su cuenta'.format(rec.name))
+    return self.show_message('Cliente Posee Cuenta', '\n'.join(_changes))
+
+    
   nombres = fields.Char(string="Nombre 1", required=True)
   apellidos = fields.Char(string="Apellido 1", required=True)
   tipo_documento = fields.Selection(selection=_TipoDocumento, string="Tipo de identificación", digits=(2), default="5")
@@ -92,8 +149,6 @@ class hr_employee_sudameris_inherit(models.Model):
   numero_cuenta = fields.Char(string="Número de la Cuenta", digits=(9), readonly=True)
   nombre_cuenta = fields.Char(string="Descripción de la Cuenta", digits=(30), readonly=True)
   sub_segmentacion = fields.Selection(selection=[('S', 'Crear'), ('N', 'No crear')], string="Sub segmentación", digits=(1), default="N")
+  wk = fields.Many2one(string='Welcome Kit', comodel_name='sudameris_employee_products')
+  state = fields.Selection(string="Estado", selection=_EstadoEmpleado, default='borrador')
 
-  @api.onchange('nombres', 'apellidos')
-  def on_change_name(self):
-      for rec in self:
-          rec.name = '{} {}'.format(rec.nombres, rec.apellidos)

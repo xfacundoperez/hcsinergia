@@ -1,13 +1,26 @@
 <odoo>
-    <data>
-        <record id="sudameris_txt_report"
+    <report
+        id="sudameris_employee_salary_movement_report"
+        model="sudameris_employee_salary_movement"
         string="Descargar archivo TXT"
-        model="hcs_sudameris.sudameris_employee_salary_movement"
-        report-type="qweb-txt"
-        name="hcs_sudameris.sudameris_txt_report_template" />
+        report_type="qweb-pdf"
+        name="sudameris_employee_salary_movement.generar_pago"
+        file="sudameris_employee_salary_movement.generar_pago"
+        attachment_use="True" />
+    
+        <!-- <record
+        id="sudameris_employee_salary_movement_report"
+        string="Descargar archivo TXT"
+        model="sudameris_employee_salary_movement"
+        report-type="qweb-pdf"
+        name="hcs_sudameris.sudameris_txt_report_template"
+        file="hcs_sudameris.sudameris_txt_report_template" />
 
+
+        attachment="(object.state in ('open','paid')) and
+            ('INV'+(object.number or '').replace('/','')+'.pdf')"
+            
         <template id="sudameris_txt_report_template">
             <t-call />
-        </template>
-    </data>
+        </template> -->
 </odoo>
