@@ -1,2 +1,2 @@
 # -*- coding: utf-8 -*-
-from . import employee, salary_movement, products
+from . import employee, salary_movement, products, res_country

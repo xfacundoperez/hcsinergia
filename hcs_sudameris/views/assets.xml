@@ -11,5 +11,5 @@
                 <link rel="stylesheet" href="/hcs_sudameris/static/src/scss/form_view_extra.scss" />
             </xpath>
         </template>
-    </data>  
+    </data>
 </odoo>

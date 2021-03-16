@@ -18,18 +18,19 @@
     'version': '1.0',
 
     # any module necessary for this one to work correctly
-    'depends': ['hr'],
+    'depends': ['hr', 'contacts'],
 
     # always loaded
     'data': [
         'security/ir.model.access.csv',
         'views/website_templates.xml',
         'views/webclient_templates.xml',
+        'views/templates.xml',
+        'views/assets.xml',
+        'views/res_country_views.xml',
         'views/employee.xml',
         'views/salary_movement.xml',
         'views/products.xml',
-        'views/templates.xml',
-        'views/assets.xml',
     ],
     # only loaded in demonstration mode
     # 'demo': [

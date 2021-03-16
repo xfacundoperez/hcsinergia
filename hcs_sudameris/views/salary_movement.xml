@@ -33,8 +33,8 @@
           </header>
           <sheet>
             <group string="Información del empleado">
-              <field name="empleado" />
-              <field name="identification_id" />
+              <field name="identification_id" attrs="{'readonly':[('state', '!=', 'preliquidacion')]}" />
+              <field name="empleado" required="True"  />
               <field name="moneda" />
               <field name="salario_bruto_def" />
             </group>

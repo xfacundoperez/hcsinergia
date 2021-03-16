@@ -1,132 +1,189 @@
 <odoo>
   <data>
+    <!-- Vista de filtros -->
+    <record id="view_employee_filter_sudameris" model="ir.ui.view">
+      <field name="name">hr.employee.search.sudameris</field>
+      <field name="model">hr.employee</field>
+      <field name="inherit_id" ref="hr.view_employee_filter" />
+      <field name="arch" type="xml">
+        <xpath expr="//search" position="replace">
+          <search string="Funcionarios">
+            <field name="name" string="Employee" filter_domain="['|', ('work_email', 'ilike', self), ('name', 'ilike', self)]" />
+            <field name="category_ids" groups="hr.group_hr_user" />
+            <field name="job_id" />
+            <separator />
+            <filter string="Borrador" name="state" domain="[('state', '=', 'borrador')]" />
+            <filter string="En proceso de alta" name="state" domain="[('state', '=', 'enproceso')]" />
+            <filter string="Listo" name="state" domain="[('state', '=', 'listo')]" />
+            <separator />
+            <filter invisible="1" string="Late Activities" name="activities_overdue" domain="[('activity_ids.date_deadline', '&lt;', context_today().strftime('%Y-%m-%d'))]" />
+            <filter invisible="1" string="Today Activities" name="activities_today" domain="[('activity_ids.date_deadline', '=', context_today().strftime('%Y-%m-%d'))]" />
+            <filter invisible="1" string="Future Activities" name="activities_upcoming_all" domain="[('activity_ids.date_deadline', '&gt;', context_today().strftime('%Y-%m-%d'))]" />
+            <separator />
+            <filter string="Archivados" name="inactive" domain="[('active', '=', False)]" />
+            <group expand="0" string="Group By">
+              <filter name="state" string="Estado" domain="[]" context="{'group_by': 'state'}" />
+              <filter name="marital" string="Estado civil" domain="[]" context="{'group_by': 'marital'}" />
+              <filter name="country_id" string="Pais" domain="[]" context="{'group_by': 'country_id'}" />
+              <filter name="ciudad" string="Ciudad" domain="[]" context="{'group_by': 'ciudad'}" />
+              <filter name="barrio" string="Barrio" domain="[]" context="{'group_by': 'barrio'}" />
+              <filter name="group_job" string="Puesto de trabajo" domain="[]" context="{'group_by': 'job_id'}" />
+            </group>
+            <searchpanel>
+              <field name="gender" icon="fa-transgender-alt" />
+              <field name="marital" icon="fa-user" />
+              <field name="job_id" icon="fa-users" />
+              <field name="tipo_documento" icon="fa-id-card" />
+            </searchpanel>
+
+          </search>
+        </xpath>
+      </field>
+    </record>
+
+    <!-- Vista Kanban -->
+    <record id="hr_kanban_view_employees_sudameris" model="ir.ui.view">
+      <field name="name">hr.employee.kanban.sudameris</field>
+      <field name="model">hr.employee</field>
+      <field name="inherit_id" ref="hr.hr_kanban_view_employees" />
+      <field name="arch" type="xml">
+        <xpath expr="//div[contains(@class, 'o_kanban_record_headings')]" position="replace">
+          <div class="o_kanban_record_headings">
+            <strong class="o_kanban_record_title">
+              <div class="oe_kanban_bottom_right">
+                <span class="float-right text-right">
+                  <field name="state" widget="label_selection" options="{'classes': {'borrador': 'danger', 'enproceso': 'info', 'listo': 'success'}}" />
+                </span>
+              </div>
+              <field name="name" placeholder="Employee's Name" />
+              <div class="position-absolute" style="bottom: 0">
+                N° Cedula:
+                <field name="identification_id" />
+                <br />
+                <br />
+              </div>
+            </strong>
+            <span t-if="record.job_title.raw_value" class="o_kanban_record_subtitle">
+              <field name="job_title" />
+            </span>
+          </div>
+        </xpath>
+      </field>
+    </record>
+
+
+    <!-- Vista tree -->
+    <record id="view_employee_tree_sudameris" model="ir.ui.view">
+      <field name="name">hr.employee.tree.sudameris</field>
+      <field name="model">hr.employee</field>
+      <field name="inherit_id" ref="hr.view_employee_tree" />
+      <field name="arch" type="xml">
+        <xpath expr="//tree" position="replace">
+          <tree string="Employees">
+            <field name="identification_id" />
+            <field name="nombre_1" />
+            <field name="nombre_2" />
+            <field name="apellido_1" />
+            <field name="apellido_2" />
+            <field name="job_id" />
+          </tree>
+        </xpath>
+      </field>
+    </record>
+
     <!-- Añadiendo campos a la vista Form del empleado -->
     <record id="sudameris_hr_employee_form" model="ir.ui.view">
-      <field name="name">hr.employee.sudameris.hr.employee.form</field>
+      <field name="name">sudameris.hr.employee.form</field>
       <field name="model">hr.employee</field>
       <field name="inherit_id" ref="hr.view_employee_form" />
       <field name="arch" type="xml">
+        <field name="hr_presence_state" position="after">
+          <field name="user_id" invisible="1" />
+          <field name="company_id" groups="base.group_multi_company" invisible="1" />
+        </field>
         <xpath expr="//header" position="replace">
-          <header>
-            <button name="btn_aprobar" string="Aprobar" confirm="¿Estás seguro que deseas aprobar este registro? El empleado quedará a espera de alta de cuenta" states="borrador" class="oe_highlight" groups="hr.group_hr_manager" type="object" />
-            <button name="btn_borrador" string="Volver a borrador" confirm="¿Estás seguro que deseas volver este registro a borrador?" states="enproceso" class="oe_highlight" type="object" />
-            <button name="btn_reiniciar" string="Reiniciar" confirm="¿Estás seguro que deseas volver este registro a En Proceso?" states="listo" class="oe_highlight" type="object" />            
-            <field name="state" widget="statusbar" statusbar_visible="borrador,enproceso,listo" statusbar_colors='{"borrador":"red","enproceso":"blue","listo":"green"}' />  
+          <header attrs="{'invisible': [('id', '=', False)]}">
+            <button name="btn_aprobar" string="Aprobar" confirm="¿Estás seguro que deseas aprobar este registro? El empleado quedará a espera de alta de cuenta" states="borrador" class="oe_highlight oe_read_only" groups="hr.group_hr_user" type="object" />
+            <button name="btn_borrador" string="Volver a borrador" confirm="¿Estás seguro que deseas volver este registro a borrador?" states="enproceso" class="oe_highlight oe_read_only" groups="hr.group_hr_user" type="object" />
+            <button name="btn_reiniciar" string="Reiniciar" confirm="¿Estás seguro que deseas volver este registro a En Proceso?" states="listo" class="oe_highlight oe_read_only" groups="hr.group_hr_user" type="object" />
+            <field name="state" widget="statusbar" statusbar_visible="borrador,enproceso,listo" statusbar_colors='{"borrador":"red","enproceso":"blue","listo":"green"}' />
           </header>
-          <!--<header>
-            <attribute name="invisible">0</attribute>
-            <button name="%{hcs_sudameris.cliente_posee_cuenta_wizzard}d" string="Cliente posee cuenta" type="action" class="oe_highlight" />
-          </header> -->
         </xpath>
-        <xpath expr="//page[@name='personal_information']/group/group[position()=1]" position="replace">
-          <group string="Contacto">
-              <field name="ciudad" class="o_force_ltr" groups="hr.group_hr_user"/>
-              <field name="departamento" class="o_force_ltr" groups="hr.group_hr_user"/>
-              <field name="barrio" class="o_force_ltr" groups="hr.group_hr_user"/>
-              <field name="calle_transversal" class="o_force_ltr" groups="hr.group_hr_user"/>
-              <field name="domicilio_real" class="o_force_ltr" groups="hr.group_hr_user"/>
-              <field name="nro_casa" class="o_force_ltr" groups="hr.group_hr_user"/>
-              <field name="phone" class="o_force_ltr" groups="hr.group_hr_user" string="Phone"/>
-              <field name="km_home_work" groups="hr.group_hr_user"/>
-          </group>
-        </xpath>
-        <xpath expr="//page[@name='personal_information']/group/group[position()=2]" position="attributes">
-          <attribute name="string">Ciudadania</attribute>
-        </xpath>
-        <xpath expr="//page[@name='personal_information']/group/group[position()=3]" position="attributes">
-          <attribute name="string">Estado civil</attribute>
-        </xpath>
-        <xpath expr="//page[@name='personal_information']/group/group[position()=4]" position="attributes">
-          <attribute name="string">Dependencia</attribute>
-        </xpath>
-        <xpath expr="//page[@name='personal_information']/group/group[position()=5]" position="attributes">
-          <attribute name="string">Emergencia</attribute>
-        </xpath>
-        <xpath expr="//page[@name='personal_information']/group/group[position()=6]" position="attributes">
-          <attribute name="string">Permiso de trabajo</attribute>
-        </xpath>
-        <xpath expr="//page[@name='personal_information']/group/group[position()=7]" position="attributes">
-          <attribute name="string">Educación</attribute>
-        </xpath>
-        <field name="name" position="attributes">
-          <attribute name="class">oe_read_only</attribute>
-          <attribute name="required">False</attribute>
-          <!--          
-          <attribute name="invisible">1</attribute>
-          <attribute name="required">False</attribute>
-            -->
-        </field>
-        <field name="name" position="after">
-          <field name="nombres" class="oe_edit_only" placeholder="Nombres" groups="hr.group_hr_user" />
-          <field name="apellidos" class="oe_edit_only" placeholder="Apellidos" groups="hr.group_hr_user" />
-        </field>
-        <field name="job_title" position="attributes">
-          <attribute name="placeholder">Posición de trabajo</attribute>
-        </field>
-        <field name="category_ids" position="attributes">
-          <attribute name="placeholder">Etiquetas</attribute>
-        </field>
-        <field name="parent_id" position="after">
-          <field name="tipo_moneda" groups="hr.group_hr_user" />
-          <field name="salario_bruto" groups="hr.group_hr_user" />
-        </field>
-        <field name="salario_bruto" position="attributes">
-          <attribute name="required">True</attribute>
-        </field>
-        <field name="identification_id" position="after">
-          <field name="tipo_documento" groups="hr.group_hr_user" />
-          <field name="vencimiento_documento" groups="hr.group_hr_user" />
-        </field>
-        <field name="tipo_documento" position="attributes">
-          <attribute name="required">True</attribute>
-        </field>
-        <field name="identification_id" position="attributes">
-          <attribute name="required">True</attribute>
-        </field>
-        <field name="work_email" position="attributes">
-          <attribute name="required">True</attribute>
-        </field>
-        <field name="work_phone" position="attributes">
-          <attribute name="required">True</attribute>
-        </field>
-        <field name="phone" position="attributes">
-          <attribute name="string">Telefono Movil</attribute>
-        </field>
-        <field name="country_id" position="attributes">
-          <attribute name="required">True</attribute>
-        </field>
-        <field name="marital" position="attributes">
-          <attribute name="required">True</attribute>
-        </field>
-        <!-- Oculto la pagina Work Information -->
-        <xpath expr="//page[@name='public']" position="attributes">
-          <attribute name="invisible">1</attribute>
-        </xpath>
-        <!-- Oculto la pagina RRHH -->
-        <xpath expr="//page[@name='hr_settings']" position="attributes">
-          <attribute name="invisible">1</attribute>
-        </xpath>
-        <!-- Agrego la pagina Sudameris -->
-        <xpath expr="//page[@name='hr_settings']" position="after">
-          <page name="hr_sudameris" string="Sudameris">
+        <xpath expr="//sheet" position="replace">
+          <sheet>
+            <widget name="web_ribbon" title="Archivado" bg_color="bg-danger" attrs="{'invisible': [('active', '=', True)]}" />
+            <field name="image_1920" widget='image' class="oe_avatar" options='{"zoom": true, "preview_image":"image_128"}' />
+            <h1 class="oe_read_only">
+              <field name="name" class="text-uppercase" />
+            </h1>
+            <div class="oe_title">
+              <h1 class="d-flex oe_edit_only">
+                <field name="nombre_1" placeholder="Primer nombre" />
+                <field name="apellido_1" placeholder="Primer apellido" />
+              </h1>
+              <h1 class="d-flex">
+                <field name="nombre_2" placeholder="Segundo nombre" />
+                <field name="apellido_2" placeholder="Segundo apellido" />
+              </h1>
+            </div>
             <group>
-                <group string="Información laboral">
-                  <field name="tipo_grupo" groups="hr.group_hr_user"/>
-                  <field name="ejecutivo" groups="hr.group_hr_user"/>
-                  <field name="tipo_contrato" groups="hr.group_hr_user"/>
-                  <field name="fecha_ingreso" groups="hr.group_hr_user"/>
-                  <field name="fecha_fin_contrato" groups="hr.group_hr_user"/>
-                </group>
-                <group string="Información bancaria">
+              <group>
+                <field name="fecha_ingreso" />
+                <field name="tipo_documento" groups="hr.group_hr_user" required="True" />
+                <field name="country_of_birth" groups="hr.group_hr_user" />
+                <field name="birthday" />
+                <field name="vencimiento_documento" groups="hr.group_hr_user" />
+                <field name="domicilio_real" class="o_force_ltr" groups="hr.group_hr_user" />
+                <field name="barrio" class="o_force_ltr" groups="hr.group_hr_user" attrs="{'readonly': [('ciudad', '=', False)]}" options="{'no_create_edit': True, 'no_open': True}" />
+                <field name="ciudad" class="o_address_city" groups="hr.group_hr_user" attrs="{'readonly': [('country_id', '=', False)]}" options="{'no_create_edit': True, 'no_open': True}" />
+                <field name="work_phone" widget="phone" />
+                <field name="tipo_contrato" groups="hr.group_hr_user" />
+                <field name="salario_bruto" groups="hr.group_hr_user" />
+                <field name="work_email" widget="email" />
+              </group>
+              <group>
+                <field name="identification_id" groups="hr.group_hr_user" required="True" />
+                <field name="country_id" options='{"no_open": True, "no_create": True}' required="True" />
+                <field name="place_of_birth" groups="hr.group_hr_user" />
+                <field name="gender" />
+                <field name="marital" />
+                <field name="nro_casa" class="o_force_ltr" groups="hr.group_hr_user" widget="integer" />
+                <field name="departamento" class="o_force_ltr" groups="hr.group_hr_user" attrs="{'readonly': [('barrio', '=', False)]}" options="{'no_create_edit': True, 'no_open': True}" />
+                <field name="phone" class="o_force_ltr" groups="hr.group_hr_user" />
+                <field name="mobile_phone" widget="phone" />
+                <field name="job_id" />
+                <separator />
+                <field name="cedula_image" widget='image' />
+              </group>
+            </group>
+            <notebook>
+              <page name="hr_sudameris" string="Sudameris" groups="hr.group_hr_manager">
+                <group string="Datos necesarios por las APIs que no están en el documento">
+                  <group string="Información laboral">
+                    <field name="tipo_grupo" groups="hr.group_hr_user" />
+                    <field name="ejecutivo" groups="hr.group_hr_user" />
+                    <field name="fecha_fin_contrato" groups="hr.group_hr_user" />
+                    <field name="calle_transversal" class="o_force_ltr" groups="hr.group_hr_user" />
+                    <field name="km_home_work" groups="hr.group_hr_user" />
+                  </group>
+                  <group string="Información bancaria">
                     <field name="numero_sucursal" groups="hr.group_hr_user" />
                     <field name="numero_cuenta" groups="hr.group_hr_user" />
-                    <field name="nombre_cuenta" groups="hr.group_hr_user"/>
-                    <field name="sub_segmentacion" groups="hr.group_hr_user"/>
-                    <field name="wk" groups="hr.group_hr_user" domain="[('tipo', '=', 'kit')]" widget="selection"/>
+                    <field name="nombre_cuenta" groups="hr.group_hr_user" />
+                    <field name="sub_segmentacion" groups="hr.group_hr_user" />
+                    <field name="tipo_moneda" groups="hr.group_hr_user" />
+                    <field name="wk" groups="hr.group_hr_user" domain="[('tipo', '=', 'kit')]" widget="selection" />
+                  </group>
                 </group>
-            </group>
-          </page>
+              </page>
+              <page string="Cedula de identidad (PDF)">
+                <field name="cedula_document" widget="pdf_viewer" />
+                <field name="cedula_name" invisible="1" />
+              </page>
+            </notebook>
+          </sheet>
         </xpath>
+        <xpath expr="//div[contains(@class, 'oe_chatter')]" position="replace"></xpath>
       </field>
     </record>
 
@@ -134,17 +191,17 @@
       <field name="name">hr.employee.wizard.form</field>
       <field name="model">hr.employee.wizard</field>
       <field name="arch" type="xml">
-          <form string="Alert form">
-              <group col="2" colspan="4">
-                  <field name="message" nolabel="1"/>
-              </group>
-              <footer>
-                <button string="Cerrar" class="oe_highlight" special="cancel" />
-              </footer>
-          </form>
+        <form string="Alert form">
+          <group col="2" colspan="4">
+            <field name="message" nolabel="1" />
+          </group>
+          <footer>
+            <button string="Cerrar" class="oe_highlight" special="cancel" />
+          </footer>
+        </form>
       </field>
     </record>
-   
+
     <record id="action_hr_wizard" model="ir.actions.act_window">
       <field name="name">Mensaje</field>
       <field name="type">ir.actions.act_window</field>
@@ -186,5 +243,16 @@
       </field>
     </record>
 
-    </data>
+    <record id="res_users_view_form_sudameris" model="ir.ui.view">
+      <field name="name">res.users.form.sudameris</field>
+      <field name="model">res.users</field>
+      <field name="inherit_id" ref="base.view_users_form" />
+      <field name="arch" type="xml">
+        <xpath expr="//header/button[last()]" position="replace"></xpath>
+        <xpath expr="//separator[contains(@string, 'Employees')]" position="replace">
+          <separator string="Funcionarios" colspan="4" />
+        </xpath>
+      </field>
+    </record>
+  </data>
 </odoo>

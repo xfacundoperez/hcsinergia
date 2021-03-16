@@ -26,8 +26,8 @@ class sudameris_employee_salary_movement(models.Model):
   _description = 'Movimientos de salario del empleado'
   _rec_name = 'empleado'
 
-  empleado = fields.Many2one(string='Empleado', comodel_name='hr.employee')
-  identification_id = fields.Char(string='Nº identificación', related='empleado.identification_id', required=True)
+  identification_id = fields.Char(string='Nº identificación', required=True)
+  empleado = fields.Many2one(comodel_name='hr.employee', string='Empleado', compute='_check_empleado', store=True)
   moneda = fields.Selection(selection=_Moneda, strsng="Moneda", related='empleado.tipo_moneda', readonly=True)
   salario_bruto_def = fields.Float(string="Salario del empleado", digits=(18, 2), related='empleado.salario_bruto', readonly=True)
   salario_importe = fields.Float(string="Salario a pagar", digits=(18, 2))
@@ -51,6 +51,27 @@ class sudameris_employee_salary_movement(models.Model):
       'target': 'new'
     }
 
+  @api.onchange('identification_id')
+  def on_change_identification_id(self):
+    _found = False
+    if (self.identification_id):
+      for empleado in self.env['hr.employee'].search([('identification_id', '=', self.identification_id)]):
+        _found = True
+        self.empleado = empleado
+        self.salario_importe = empleado.salario_bruto
+      if not _found:
+        self.empleado = None
+        self.salario_importe = 0    
+    
+  @api.depends('identification_id', 'salario_importe')    
+  def _check_empleado(self):
+    for rec in self:
+      if rec.identification_id:
+        for empleado in self.env['hr.employee'].search([('identification_id', '=', rec.identification_id)]):
+          rec.empleado = empleado
+          rec.salario_importe = empleado.salario_bruto
+        
+    
   def btn_aprobar(self):
     for rec in self:
       rec.state = 'aprobado'
