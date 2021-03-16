@@ -249,9 +249,6 @@
       <field name="inherit_id" ref="base.view_users_form" />
       <field name="arch" type="xml">
         <xpath expr="//header/button[last()]" position="replace"></xpath>
-        <xpath expr="//separator[contains(@string, 'Employees')]" position="replace">
-          <separator string="Funcionarios" colspan="4" />
-        </xpath>
       </field>
     </record>
   </data>
