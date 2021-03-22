@@ -5,7 +5,7 @@ _TipoProducto = [('producto', 'Producto'), ('kit', 'Welcome Kit')]
 
 class sudameris_employee_products(models.Model):
   _name = 'sudameris_employee_products'
-  _description = 'Paquete/productos del empleado'
+  _description = 'Paquete/productos del funcionario'
 
   name = fields.Char(index=True)
   tipo = fields.Selection(string="Tipo de producto", selection=_TipoProducto, default='producto', store=True, required=True)

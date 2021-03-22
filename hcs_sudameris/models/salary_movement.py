@@ -23,13 +23,13 @@ class sudameris_employee_salary_movement_wizard(models.TransientModel):
 
 class sudameris_employee_salary_movement(models.Model):
   _name = 'sudameris_employee_salary_movement'
-  _description = 'Movimientos de salario del empleado'
-  _rec_name = 'empleado'
+  _description = 'Movimientos de salario del funcionario'
+  _rec_name = 'funcionario'
 
   identification_id = fields.Char(string='Nº identificación', required=True)
-  empleado = fields.Many2one(comodel_name='hr.employee', string='Empleado', compute='_check_empleado', store=True)
-  moneda = fields.Selection(selection=_Moneda, strsng="Moneda", related='empleado.tipo_moneda', readonly=True)
-  salario_bruto_def = fields.Float(string="Salario del empleado", digits=(18, 2), related='empleado.salario_bruto', readonly=True)
+  funcionario = fields.Many2one(comodel_name='hr.employee', string='Funcionario', compute='_check_funcionario', store=True)
+  moneda = fields.Selection(selection=_Moneda, strsng="Moneda", related='funcionario.tipo_moneda', readonly=True)
+  salario_bruto_def = fields.Float(string="Salario del funcionario", digits=(18, 2), related='funcionario.salario_bruto', readonly=True)
   salario_importe = fields.Float(string="Salario a pagar", digits=(18, 2))
   tipo_cobro = fields.Selection(selection=_TipoCobro, string="Tipo de Cobro", default="1")
   fecha_pago = fields.Date(string="Fecha de pago", default=lambda s: fields.Date.context_today(s))
@@ -55,21 +55,21 @@ class sudameris_employee_salary_movement(models.Model):
   def on_change_identification_id(self):
     _found = False
     if (self.identification_id):
-      for empleado in self.env['hr.employee'].search([('identification_id', '=', self.identification_id)]):
+      for funcionario in self.env['hr.employee'].search([('identification_id', '=', self.identification_id)]):
         _found = True
-        self.empleado = empleado
-        self.salario_importe = empleado.salario_bruto
+        self.funcionario = funcionario
+        self.salario_importe = funcionario.salario_bruto
       if not _found:
-        self.empleado = None
+        self.funcionario = None
         self.salario_importe = 0    
     
   @api.depends('identification_id', 'salario_importe')    
-  def _check_empleado(self):
+  def _check_funcionario(self):
     for rec in self:
       if rec.identification_id:
-        for empleado in self.env['hr.employee'].search([('identification_id', '=', rec.identification_id)]):
-          rec.empleado = empleado
-          rec.salario_importe = empleado.salario_bruto
+        for funcionario in self.env['hr.employee'].search([('identification_id', '=', rec.identification_id)]):
+          rec.funcionario = funcionario
+          rec.salario_importe = funcionario.salario_bruto
         
     
   def btn_aprobar(self):
@@ -109,8 +109,11 @@ class sudameris_employee_salary_movement(models.Model):
     for rec in movimientos:
       if rec.state == 'aprobado':
         _ids.append('{}'.format(rec.id))
-    return {
-      'type': 'ir.actions.act_url',
-      'url': '/web/binary_text/crear_txt?ids={}'.format(','.join(_ids)),
-      'target': 'self'
-    }
+    if _ids:
+      return {
+        'type': 'ir.actions.act_url',
+        'url': '/web/binary_text/crear_txt?ids={}'.format(','.join(_ids)),
+        'target': 'self'
+      }
+    else:
+      return self.show_message('Generar Pago', 'No se generó ningun pago')

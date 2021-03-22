@@ -6,9 +6,7 @@
       <field name="model">sudameris_employee_salary_movement</field>
       <field name="arch" type="xml">
         <tree string="Movimientos de salario">
-          <!-- <field name="empleado_nombres" />
-          <field name="empleado_apellidos" /> -->
-          <field name="empleado" />
+          <field name="funcionario" />
           <field name="identification_id" />
           <field name="salario_bruto_def" />
           <field name="salario_importe" />
@@ -32,9 +30,9 @@
             <field name="state" widget="statusbar" statusbar_visible="preliquidacion,aprobado,enproceso,cancelado,liquidado" statusbar_colors='{"cancelado":"red","aprobado":"blue","liquidado":"green"}' />
           </header>
           <sheet>
-            <group string="Información del empleado">
+            <group string="Información del funcionario">
               <field name="identification_id" attrs="{'readonly':[('state', '!=', 'preliquidacion')]}" />
-              <field name="empleado" required="True"  />
+              <field name="funcionario" required="True"  />
               <field name="moneda" />
               <field name="salario_bruto_def" />
             </group>
