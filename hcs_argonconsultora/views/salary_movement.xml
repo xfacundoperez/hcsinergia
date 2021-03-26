@@ -108,8 +108,8 @@
 
     <record id="action_argonconsultora_aproved" model="ir.actions.server">
       <field name="name">Aprobar</field>
-      <field name="model_id" ref="model_argonconsultora_employee_salary_movement" />
-      <field name="binding_model_id" ref="model_argonconsultora_employee_salary_movement" />
+      <field name="model_id" ref="model_employee_salary_movement" />
+      <field name="binding_model_id" ref="model_employee_salary_movement" />
       <field name="binding_view_types">list</field>
       <field name="state">code</field>
       <field name="code">
@@ -119,8 +119,8 @@
 
     <record id="action_argonconsultora_send_data" model="ir.actions.server">
       <field name="name">Generar archivo .TXT</field>
-      <field name="model_id" ref="model_argonconsultora_employee_salary_movement" />
-      <field name="binding_model_id" ref="model_argonconsultora_employee_salary_movement" />
+      <field name="model_id" ref="model_employee_salary_movement" />
+      <field name="binding_model_id" ref="model_employee_salary_movement" />
       <field name="binding_view_types">list</field>
       <field name="state">code</field>
       <field name="code">
