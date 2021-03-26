@@ -17,7 +17,7 @@
             padding: 10px;
             line-height: 20px;
             letter-spacing: 1px;
-            color: #f0f0f0;
+            color: #02b2cf !important;
             -webkit-transform: rotate(45deg);
             -ms-transform: rotate(45deg);
             -moz-transform: rotate(45deg);
