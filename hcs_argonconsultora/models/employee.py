@@ -3,7 +3,7 @@ import base64
 from odoo import models, fields, api, _
 from odoo.exceptions import ValidationError
 from odoo.modules.module import get_module_resource
-from .sudameris_api import SudamerisApi
+from .employee_api import EmployeeApi
 from datetime import datetime, date
 import logging, json
 
@@ -31,7 +31,7 @@ class hr_employee_wizard(models.TransientModel):
   message = fields.Text(readonly=True, store=False)
 
 
-class hr_employee_sudameris_inherit(models.Model):
+class hr_employee_inherit(models.Model):
   _inherit = 'hr.employee'
   
   nombre_1 = fields.Char(string="Primer Nombre", required=True)
@@ -58,7 +58,7 @@ class hr_employee_sudameris_inherit(models.Model):
   numero_cuenta = fields.Char(string="Número de la Cuenta", digits=(9), readonly=True)
   nombre_cuenta = fields.Char(string="Descripción de la Cuenta", digits=(30), readonly=True)
   sub_segmentacion = fields.Selection(selection=[('S', 'Crear'), ('N', 'No crear')], string="Sub segmentación", digits=(1), default="N")
-  wk = fields.Many2one(string='Welcome Kit', comodel_name='sudameris_employee_products')
+  wk = fields.Many2one(string='Welcome Kit', comodel_name='employee_products')
   state = fields.Selection(string="Estado", selection=_EstadosFuncionario, default='borrador')
   cedula_image = fields.Binary(string="Cédula de Identidad (imagen)", max_width=100, max_height=100)
   cedula_document = fields.Binary(string="Cédula de Identidad (PDF)")
@@ -120,7 +120,7 @@ class hr_employee_sudameris_inherit(models.Model):
   def _on_change_salario_bruto(self):
     if self.state != 'listo': # Solo si el funcionario no está listo, obtengo los kits y le asigno el kit minimo
       _kit_selected = False
-      for kit in self.env['sudameris_employee_products'].search([('tipo', '=', 'kit')], order='salario_minimo desc'):
+      for kit in self.env['employee_products'].search([('tipo', '=', 'kit')], order='salario_minimo desc'):
         if self.salario_bruto >= kit.salario_minimo:
           self._origin.wk = self.wk = kit.id
           _kit_selected = True
@@ -199,7 +199,7 @@ class hr_employee_sudameris_inherit(models.Model):
     _count_ok = 0
     _errors = []
     # Obtengo el context de movimientos de salarios
-    movimientos = self.env['sudameris_employee_salary_movement']
+    movimientos = self.env['employee_salary_movement']
     # Obtengo los funcionarios seleccionados
     for funcionario in self.env['hr.employee'].browse(self._context.get('active_ids')):
       _create = True
@@ -231,7 +231,7 @@ class hr_employee_sudameris_inherit(models.Model):
 
     _changes = []
     # Creo la clase y le paso como parametro ir.config_parameter como sudo      
-    sudamerisApi = SudamerisApi(self.env['ir.config_parameter'].sudo())
+    employeeApi = EmployeeApi(self.env['ir.config_parameter'].sudo())
     # Obtengo los funcionarios seleccionados y verifco cada uno
     for funcionario in self.env['hr.employee'].browse(self._context.get('active_ids')):
       if funcionario.state == 'borrador':
@@ -241,7 +241,7 @@ class hr_employee_sudameris_inherit(models.Model):
         _changes.append('{} ya posee una cuenta en el banco'.format(funcionario.name))
         continue
       # Hago la consulta a la API
-      result = sudamerisApi.ws_cliente_posee_cuenta(funcionario.country_id.name, funcionario.tipo_documento, funcionario.identification_id)
+      result = employeeApi.ws_cliente_posee_cuenta(funcionario.country_id.name, funcionario.tipo_documento, funcionario.identification_id)
       for res in result:
         _valor = res["Filas"]["RepFilas.Fila"][0]["Valor"]
         if res['Descripcion'] == "CTNRO": # Número de cuenta

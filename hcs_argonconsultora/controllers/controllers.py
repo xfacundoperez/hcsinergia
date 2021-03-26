@@ -6,7 +6,7 @@ import tempfile
 
 _logger = logging.getLogger(__name__)
 
-class Sudameris_employee_salary_movement_controller(http.Controller):
+class Employee_salary_movement_controller(http.Controller):
     @http.route('/web/binary_text/crear_txt', type='http', auth="user")
     def index(self, req):        
         # Composición del nombre: ENTIDAD_SERVICIO_FECHA+HORA.TXT
@@ -25,9 +25,9 @@ class Sudameris_employee_salary_movement_controller(http.Controller):
         # Obtengo los movimientos seleccionados
         if not req.params.get('ids'):
             return False
-        movimientos = http.request.env['sudameris_employee_salary_movement'].search([('id', 'in', req.params.get('ids').split(','))])
+        movimientos = http.request.env['employee_salary_movement'].search([('id', 'in', req.params.get('ids').split(','))])
         # Creo el TXT
-        _txt_title = 'SUDAMERIS_ODOO_{}.txt'.format(datetime.strftime(datetime.now(), '%Y%m%d%H%M%S'))
+        _txt_title = 'ODOO_{}.txt'.format(datetime.strftime(datetime.now(), '%Y%m%d%H%M%S'))
         _txt_content_header = 'H;999;mail@entidad.com;6900;52000.00;1;19/05/20;202005902952101999;1;1;1982073;10;20;6900;0;0;0\n'
         _txt_content_detail = ''
         for movimiento in movimientos:
@@ -35,7 +35,7 @@ class Sudameris_employee_salary_movement_controller(http.Controller):
                 funcionario = movimiento.funcionario
                 # Genero el detalle con los datos del funcionario
                 #D;PAGO DE SALARIO VIA BANCO;APELLIDO 1;APELLIDO 2;NOMBRE 1;NOMBRE 2;586;1;111222;6900;52000.00;19/05/20;21;498154;10;6900;0;0;0;202005902952101999;1;528000.00;31/12/99
-                _detalle = "D;SUDAMERIS_ODOO;{0};{1};{2};{3};{4};{5};{6};{7};{8};{9};{10};{11};{12};{13};{14};{15};{16};{17};{18};{19};{20}\n".format(
+                _detalle = "D;ODOO;{0};{1};{2};{3};{4};{5};{6};{7};{8};{9};{10};{11};{12};{13};{14};{15};{16};{17};{18};{19};{20}\n".format(
                 funcionario.apellido_1 or '', funcionario.apellido_2 or '', funcionario.nombre_1 or '', funcionario.nombre_2 or '',
                 funcionario.country_id.name or '', funcionario.tipo_documento or '', funcionario.identification_id or '', movimiento.moneda or '',
                 movimiento.salario_importe or '', movimiento.fecha_pago or '', movimiento.modalidad_pago or '', funcionario.numero_cuenta or '', 
@@ -55,21 +55,3 @@ class Sudameris_employee_salary_movement_controller(http.Controller):
                 ('Content-Disposition', 'attachment; filename="{}"'.format(_txt_title)),
                 ('Content-Type', 'text/plain')
             ])
-
-    
-#     @http.route('/hcs_sudameris/hcs_sudameris/', auth='public')
-#     def index(self, **kw):
-#         return "Hello, world"
-
-#     @http.route('/hcs_sudameris/hcs_sudameris/objects/', auth='public')
-#     def list(self, **kw):
-#         return http.request.render('hcs_sudameris.listing', {
-#             'root': '/hcs_sudameris/hcs_sudameris',
-#             'objects': http.request.env['hcs_sudameris.hcs_sudameris'].search([]),
-#         })
-
-#     @http.route('/hcs_sudameris/hcs_sudameris/objects/<model("hcs_sudameris.hcs_sudameris"):obj>/', auth='public')
-#     def object(self, obj, **kw):
-#         return http.request.render('hcs_sudameris.object', {
-#             'object': obj
-#         })

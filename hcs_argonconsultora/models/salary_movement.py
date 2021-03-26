@@ -15,14 +15,14 @@ _ModalidadPago = [('20', 'Débito en Cta. Cte'), ('21', 'Débito Caja de Ahorro'
 
 _EstadoMovimiento = [('preliquidacion', 'Preliquidación'), ('aprobado', 'Aprobado'), ('enproceso', 'En Proceso'), ('cancelado', 'Cancelado'), ('liquidado', 'Liquidado')]
 
-class sudameris_employee_salary_movement_wizard(models.TransientModel):
-  _name = "sudameris_employee_salary_movement.wizard"
+class employee_salary_movement_wizard(models.TransientModel):
+  _name = "employee_salary_movement.wizard"
   _description = "Sudameris Employee Salary Movement wizard"
   message = fields.Text(readonly=True, store=False)
 
 
-class sudameris_employee_salary_movement(models.Model):
-  _name = 'sudameris_employee_salary_movement'
+class employee_salary_movement(models.Model):
+  _name = 'employee_salary_movement'
   _description = 'Movimientos de salario del funcionario'
   _rec_name = 'funcionario'
 
@@ -44,7 +44,7 @@ class sudameris_employee_salary_movement(models.Model):
     return {
       'name': title,
       'type': 'ir.actions.act_window',
-      'res_model': 'sudameris_employee_salary_movement.wizard',
+      'res_model': 'employee_salary_movement.wizard',
       'view_mode': 'form',
       'view_type': 'form',
       'context': {'default_message': message},
@@ -85,26 +85,26 @@ class sudameris_employee_salary_movement(models.Model):
     #import wdb
     #wdb.set_trace()
     config_parameter = self.env['ir.config_parameter'].sudo()
-    sudameris_auth = json.loads(config_parameter.get_param('sudameris.auth'))
+    _auth = json.loads(config_parameter.get_param('employee.auth'))
     # Si la fecha de hoy es mayor a la fecha de expiración
-    if datetime.now() > datetime.strptime(sudameris_auth['expiration'], '%Y-%m-%d %H:%M:%S'):
+    if datetime.now() > datetime.strptime(_auth['expiration'], '%Y-%m-%d %H:%M:%S'):
       r = requests.post('https://alertaseg.com.ar:8089/api/alerta_gps/check', data={})
       return r.content
       # raise ValidationError(json.dumps(r, indent=4))
       ### Me contecto al banco y espero respuesta del mismo *CREAR CONEXION VIA POST
       #
       # Guardo los nuevos datos en el parametro
-      sudameris_auth = '{"token": "TOKEN_TEST","expiration":"2021-02-01 00:00:00"}'
-      config_parameter.set_param('sudameris.auth', sudameris_auth)
-      sudameris_auth = json.loads(sudameris_auth)
+      _auth = '{"token": "TOKEN_TEST","expiration":"2021-02-01 00:00:00"}'
+      config_parameter.set_param('employee.auth', _auth)
+      _auth = json.loads(_auth)
       #
       ### Finalizo la configuración del banco
     # Siempre retorno el token valido
-    return sudameris_auth
+    return _auth
 
   def generar_pago(self):
     # Obtengo los movimientos seleccionados
-    movimientos = self.env['sudameris_employee_salary_movement'].browse(self._context.get('active_ids'))
+    movimientos = self.env['employee_salary_movement'].browse(self._context.get('active_ids'))
     _ids = []
     for rec in movimientos:
       if rec.state == 'aprobado':

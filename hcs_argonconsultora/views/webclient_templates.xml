@@ -1,13 +1,13 @@
 <odoo>
   <data>
-    <template id="web_login_layout_sudameris" inherit_id="web.login_layout">
+    <template id="web_login_layout_argonconsultora" inherit_id="web.login_layout">
       <xpath expr="//div[@class='text-center small mt-4 pt-3 border-top']" position="replace">
         <!-- Nada -->
       </xpath>
     </template>
-    <template id="login_layout_sudameris" inherit_id="web.login">
+    <template id="login_layout_argonconsultora" inherit_id="web.login">
       <xpath expr="*" position="after">
-        <link rel="stylesheet" href="/hcs_sudameris/static/src/css/style.css" />
+        <link rel="stylesheet" href="/hcs_argonconsultora/static/src/css/style.css" />
         <style>
           .test-ribbon{
             width: 300px;

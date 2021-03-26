@@ -1,8 +1,8 @@
 <odoo>
   <data>
     <!-- Vista de filtros -->
-    <record id="view_employee_filter_sudameris" model="ir.ui.view">
-      <field name="name">hr.employee.search.sudameris</field>
+    <record id="view_employee_filter_argonconsultora" model="ir.ui.view">
+      <field name="name">hr.employee.search.argonconsultora</field>
       <field name="model">hr.employee</field>
       <field name="inherit_id" ref="hr.view_employee_filter" />
       <field name="arch" type="xml">
@@ -42,8 +42,8 @@
     </record>
 
     <!-- Vista Kanban -->
-    <record id="hr_kanban_view_employees_sudameris" model="ir.ui.view">
-      <field name="name">hr.employee.kanban.sudameris</field>
+    <record id="hr_kanban_view_employees_argonconsultora" model="ir.ui.view">
+      <field name="name">hr.employee.kanban.argonconsultora</field>
       <field name="model">hr.employee</field>
       <field name="inherit_id" ref="hr.hr_kanban_view_employees" />
       <field name="arch" type="xml">
@@ -96,8 +96,8 @@
 
 
     <!-- Vista tree -->
-    <record id="view_employee_tree_sudameris" model="ir.ui.view">
-      <field name="name">hr.employee.tree.sudameris</field>
+    <record id="view_employee_tree_argonconsultora" model="ir.ui.view">
+      <field name="name">hr.employee.tree.argonconsultora</field>
       <field name="model">hr.employee</field>
       <field name="inherit_id" ref="hr.view_employee_tree" />
       <field name="arch" type="xml">
@@ -114,8 +114,8 @@
     </record>
 
     <!-- Añadiendo campos a la vista Form del funcionario -->
-    <record id="sudameris_hr_employee_form" model="ir.ui.view">
-      <field name="name">sudameris.hr.employee.form</field>
+    <record id="argonconsultora_hr_employee_form" model="ir.ui.view">
+      <field name="name">argonconsultora.hr.employee.form</field>
       <field name="model">hr.employee</field>
       <field name="inherit_id" ref="hr.view_employee_form" />
       <field name="arch" type="xml">
@@ -178,7 +178,7 @@
               </group>
             </group>
             <notebook>
-              <page name="hr_sudameris" string="Sudameris" groups="hr.group_hr_manager">
+              <page name="hr_argonconsultora" string="Sudameris" groups="hr.group_hr_manager">
                 <group string="Datos necesarios por las APIs que no están en el documento">
                   <group string="Información laboral">
                     <field name="tipo_grupo" groups="hr.group_hr_user" />
@@ -231,7 +231,7 @@
       <field name="domain">[]</field>
     </record>
 
-    <record id="action_sudameris_cliente_posee_cuenta" model="ir.actions.server">
+    <record id="action_argonconsultora_cliente_posee_cuenta" model="ir.actions.server">
       <field name="name">Cliente posee cuenta</field>
       <field name="model_id" ref="model_hr_employee" />
       <field name="binding_model_id" ref="model_hr_employee" />
@@ -242,7 +242,7 @@
       </field>
     </record>
 
-    <record id="action_sudameris_employee_crear_movimientos" model="ir.actions.server">
+    <record id="action_argonconsultora_employee_crear_movimientos" model="ir.actions.server">
       <field name="name">Crear movimientos</field>
       <field name="model_id" ref="model_hr_employee" />
       <field name="binding_model_id" ref="model_hr_employee" />
@@ -253,7 +253,7 @@
       </field>
     </record>
 
-    <record id="action_sudameris_employee_aprobar" model="ir.actions.server">
+    <record id="action_argonconsultora_employee_aprobar" model="ir.actions.server">
       <field name="name">Aprobar</field>
       <field name="model_id" ref="model_hr_employee" />
       <field name="binding_model_id" ref="model_hr_employee" />
@@ -264,8 +264,8 @@
       </field>
     </record>
 
-    <record id="res_users_view_form_sudameris" model="ir.ui.view">
-      <field name="name">res.users.form.sudameris</field>
+    <record id="res_users_view_form_argonconsultora" model="ir.ui.view">
+      <field name="name">res.users.form.argonconsultora</field>
       <field name="model">res.users</field>
       <field name="inherit_id" ref="base.view_users_form" />
       <field name="arch" type="xml">

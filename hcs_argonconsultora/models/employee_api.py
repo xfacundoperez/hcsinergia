@@ -79,16 +79,16 @@ class SudamerisApi:
   obtener uno nuevo con el servicio Authenticate para no usar el mismo innecesariamente
   """
   def __get_token(self):
-    expiration = self.config_parameter.get_param('sudameris.expiration')
-    token      = self.config_parameter.get_param('sudameris.token')
+    expiration = self.config_parameter.get_param('employee.expiration')
+    token      = self.config_parameter.get_param('employee.token')
     # Si la fecha de hoy es mayor a la fecha de expiración
     if datetime.today().date() > datetime.strptime(expiration, '%Y-%m-%d %H:%M:%S').date():
       # Como está vencido, actualizo el token
       try:
         new_auth = self.__ws_authenticate()
         token = new_auth['token']
-        self.config_parameter.set_param('sudameris.expiration', new_auth['expiration'])
-        self.config_parameter.set_param('sudameris.token', token)
+        self.config_parameter.set_param('employee.expiration', new_auth['expiration'])
+        self.config_parameter.set_param('employee.token', token)
       except:
         token = None
     return token
