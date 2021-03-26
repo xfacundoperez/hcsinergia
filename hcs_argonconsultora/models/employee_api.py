@@ -56,7 +56,7 @@ _CodigoPaises = [('105', 'BRASIL'), ('845', 'URUGUAY'), ('63', 'ARGENTINA'), ('5
 ('890', 'ZAMBIA'), ('895', 'ZONADELCANALDEPA'), ('896', 'HOLANDA'), ('897', 'ESCOCIA')]
 
 
-class SudamerisApi:
+class EmployeeApi:
   #Variables de la clase
   
   def __init__(self, config_parameter):
