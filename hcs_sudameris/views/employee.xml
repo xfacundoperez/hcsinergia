@@ -102,12 +102,13 @@
       <field name="inherit_id" ref="hr.view_employee_tree" />
       <field name="arch" type="xml">
         <xpath expr="//tree" position="replace">
-          <tree string="Employees" create="false" decoration-danger="state=='borrador'" decoration-info="state=='enproceso'" decoration-success="state=='listo'">
+          <tree string="Employees" default_order='state' create="false" decoration-danger="state=='borrador'" decoration-info="state=='enproceso'" decoration-success="state=='listo'">
             <field name="name" />
             <field name="identification_id" string="Cedula de identidad" />
             <field name="salario_bruto" widget='monetary' />
             <field name="job_id" readonly="1" />
             <field name="state" readonly="1" />
+            <field name="base_confiable" string="Confiable" readonly="1" />
           </tree>
         </xpath>
       </field>
@@ -148,17 +149,18 @@
                 <field name="nombre_2" placeholder="Segundo nombre" />
               </h1>
             </div>
+            <field name="base_confiable" groups="hr.group_hr_user" />
             <group>
               <group>
                 <field name="fecha_ingreso" />
-                <field name="tipo_documento" groups="hr.group_hr_user" required="True" />
+                <field name="tipo_documento" groups="hr.group_hr_user" required="True" string="Tipo de Cédula" />
                 <field name="country_of_birth" groups="hr.group_hr_user" />
                 <field name="birthday" />
                 <field name="vencimiento_documento" groups="hr.group_hr_user" />
                 <field name="domicilio_real" class="o_force_ltr" groups="hr.group_hr_user" />
                 <field name="barrio" class="o_force_ltr" groups="hr.group_hr_user" attrs="{'readonly': [('departamento', '=', False)]}" options="{'no_create_edit': True, 'no_open': True}" />
                 <field name="ciudad" class="o_address_city" groups="hr.group_hr_user" attrs="{'readonly': [('country_id', '=', False)]}" options="{'no_create_edit': True, 'no_open': True}" />
-                <field name="work_phone" widget="phone" />
+                <field name="work_phone" widget="phone" string="Teléfono Laboral" />
                 <field name="tipo_contrato" groups="hr.group_hr_user" />
                 <field name="salario_bruto" groups="hr.group_hr_user" />
                 <field name="work_email" string="E-mail" widget="email" />
@@ -196,7 +198,7 @@
                     <field name="wk" groups="hr.group_hr_user" domain="[('tipo', '=', 'kit')]" widget="selection" />
                   </group>
                 </group>
-              </page>
+             </page>
               <page string="Cedula de identidad (PDF)">
                 <field name="cedula_document" widget="pdf_viewer" />
                 <field name="cedula_name" invisible="1" />
@@ -229,6 +231,17 @@
       <field name="res_model">hr.employee.wizard</field>
       <field name="view_mode">form</field>
       <field name="domain">[]</field>
+    </record>
+
+    <record id="action_sudameris_cliente_valida_base_confiable" model="ir.actions.server">
+      <field name="name">Validar usuario</field>
+      <field name="model_id" ref="model_hr_employee" />
+      <field name="binding_model_id" ref="model_hr_employee" />
+      <field name="binding_view_types">list,form</field>
+      <field name="state">code</field>
+      <field name="code">
+        action = record.cliente_valida_base_confiable()
+      </field>
     </record>
 
     <record id="action_sudameris_cliente_posee_cuenta" model="ir.actions.server">
