@@ -101,7 +101,7 @@
                                 <label for="notes" />
                                 <field name="notes" />
                             </page>
-                            <page string="Información bancaria" groups="hcs_bankmanagement.group_bm_bank">
+                            <page string="Información bancaria" groups="hcs_bm.group_bm_bank">
                                 <group>
                                     <group>
                                         <field name="branch_number" readonly="1" />

@@ -16,7 +16,7 @@ class BM_Official(models.Model):
 
     @api.model
     def _default_image(self):
-        image_path = get_module_resource('hcs_bankmanagement', 'static/src/img', 'default_image.png')
+        image_path = get_module_resource('hcs_bm', 'static/src/img', 'default_image.png')
         return base64.b64encode(open(image_path, 'rb').read())
 
     # Basic info
