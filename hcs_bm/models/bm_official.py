@@ -103,13 +103,6 @@ class BM_Official(models.Model):
     notes = fields.Text('Notas')
     color = fields.Integer('Color Index', default=0)
     # pin = fields.Char(string="PIN", copy=False, help="PIN used to Check In/Out in Kiosk Mode (if enabled in Configuration).")
-    departure_reason = fields.Selection([
-        ('fired', 'Despido'),
-        ('resigned', 'Renuncia'),
-        ('retired', 'Retirado')
-    ], string="Motivo de salida", copy=False, tracking=True)
-    departure_description = fields.Text(string="Salida: Información adicional", copy=False, tracking=True)
-
     company_id = fields.Many2one('res.company', required=True, default=lambda self: self.env.company)
     department_id = fields.Many2one('bm.department', 'Departmento', domain="['|', ('company_id', '=', False), ('company_id', '=', company_id)]")
     job_id = fields.Many2one('bm.job', 'Puesto de trabajo', domain="['|', ('company_id', '=', False), ('company_id', '=', company_id)]")
@@ -134,6 +127,7 @@ class BM_Official(models.Model):
         string="Estado", default='draft')
     reliable_base = fields.Boolean(
         string="Validación", default=False, readonly=True)
+    departured = fields.Many2one('bm.official.departure', 'Licencia', compute="_compute_departured")
 
     def show_message(self, title, message, *args):
         return {
@@ -174,6 +168,11 @@ class BM_Official(models.Model):
             elif not official.coach_id:
                 official.coach_id = False
 
+    @api.depends('departured')
+    def _compute_departured(self):
+        for official in self:
+            official.departured = self.env['bm.official.departure'].search(['&', ('identification_id', '=', official.identification_id), ('state', '=', 'active')], order='id desc', limit=1)
+                        
     @api.onchange('name_first', 'name_second', 'surname_first', 'surname_second', 'account_number', 'state', 'reliable_base')
     def _on_change_name(self):
         for official in self:

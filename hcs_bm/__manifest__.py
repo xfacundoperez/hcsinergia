@@ -14,6 +14,7 @@
     """,
     'author': "HC Sinergia",
     'website': "http://www.hcsinergia.com",
+    #'sequence': 99,
     # any module necessary for this one to work correctly
     'depends': ['base', 'contacts'],
     # always loaded
@@ -26,6 +27,7 @@
         'views/webclient_templates.xml',
         'views/res_country.xml',
         'views/bm_official.xml',
+        'views/bm_official_departure.xml',
         'views/bm_official_salary.xml',
         'views/bm_product.xml',
         'views/bm_job.xml',

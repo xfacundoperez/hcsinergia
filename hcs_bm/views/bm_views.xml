@@ -7,7 +7,8 @@
         <menuitem id="menu_bm_main" name="Opciones" parent="hcs_bm.menu_bm_root" sequence="0"/>
         <menuitem id="menu_bm_official" name="Lista de Funcionarios" action="action_official_open_view" parent="hcs_bm.menu_bm_main" sequence="1" groups="group_bm_company" />
         <menuitem id="menu_bm_official_salary" name="Movimientos de salarios" action="action_official_salary_open_view" parent="hcs_bm.menu_bm_main" sequence="2" groups="group_bm_company" />
-        <menuitem id="menu_bm_product" name="Paquetes / productos" action="action_product_open_view" parent="hcs_bm.menu_bm_main" sequence="3" groups="group_bm_bank" />
+        <menuitem id="menu_bm_official_departure" name="Licencias" action="action_official_departure_open_view" parent="hcs_bm.menu_bm_main" sequence="3" groups="group_bm_company" />
+        <menuitem id="menu_bm_product" name="Paquetes / productos" action="action_product_open_view" parent="hcs_bm.menu_bm_main" sequence="4" groups="group_bm_bank" />
 
         <menuitem id="menu_bm_config" name="Configuración" parent="hcs_bm.menu_bm_root" sequence="1" groups="group_bm_company" />
         <menuitem id="menu_bm_job" name="Puestos de trabajo" action="action_job_open_view" parent="hcs_bm.menu_bm_config" sequence="0" groups="group_bm_company" />
