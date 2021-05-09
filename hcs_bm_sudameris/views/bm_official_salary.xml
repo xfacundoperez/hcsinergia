@@ -30,7 +30,7 @@
                     <sheet>
                         <field name="company_id" invisible="1" />
                         <group string="Información del funcionario">
-                            <field name="identification_id" attrs="{'readonly':[('state', '!=', 'draft')]}" />
+                            <field name="identification_id" attrs="{'readonly':[('id', '!=', False)]}" />
                             <field name="official" required="True" />
                             <field name="currency_type" />
                             <field name="official_gross_salary" />

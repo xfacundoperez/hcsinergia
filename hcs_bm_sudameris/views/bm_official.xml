@@ -11,9 +11,6 @@
                     <field name="gross_salary" widget='monetary' />
                     <field name="job_id" readonly="1" />
                     <field name="state" readonly="1" />
-                    <field name="account_number" readonly="1" />
-                    <field name="account_name" readonly="1" />
-                    <field name="reliable_base" string="Confiable" readonly="1" />
                 </tree>
             </field>
         </record>
@@ -63,8 +60,8 @@
                                 <field name="birthday" />
                                 <field name="identification_expiry" />
                                 <field name="real_address" class="o_force_ltr" />
-                                <field name="neighborhood" class="o_force_ltr" attrs="{'readonly': [('department', '=', False)]}" options="{'no_create_edit': True, 'no_open': True}" />
-                                <field name="city" class="o_address_city" options="{'no_create_edit': True, 'no_open': True}" attrs="{'readonly': [('country', '=', False)]}" />
+                                <field name="neighborhood" class="o_force_ltr" attrs="{'readonly': [('department', '=', False)]}"  options='{"no_open": True, "no_create": True}' />
+                                <field name="city" class="o_address_city"  options='{"no_open": True, "no_create": True}' attrs="{'readonly': [('country', '=', False)]}" />
                                 <field name="work_phone" widget="phone" string="Teléfono Laboral" />
                                 <field name="contract_type" />
                                 <field name="gross_salary" />
@@ -73,13 +70,13 @@
                             <group>
                                 <field name="identification_id" string="Cédula de Identidad" required="True" />
                                 <field name="country" options='{"no_open": True, "no_create": True}' required="True" />
-                                <field name="place_of_birth" options="{'no_create_edit': True, 'no_open': True}" attrs="{'readonly': [('country_of_birth', '=', False)]}" />
+                                <field name="place_of_birth" options='{"no_open": True, "no_create": True}' attrs="{'readonly': [('country_of_birth', '=', False)]}" />
                                 <field name="gender" />
                                 <field name="marital" />
                                 <field name="house_no" class="o_force_ltr" widget="integer" />
-                                <field name="department" class="o_force_ltr" attrs="{'readonly': [('city', '=', False)]}" options="{'no_create_edit': True, 'no_open': True}" />
+                                <field name="department" class="o_force_ltr" attrs="{'readonly': [('city', '=', False)]}"  options='{"no_open": True, "no_create": True}' />
                                 <field name="mobile_phone" widget="phone" string="Teléfono personal" />
-                                <field name="job_id" />
+                                <field name="job_id" options='{"no_open": True, "no_create": True}' />
                                 <separator />
                                 <field name='idenfitication_image_front' widget='image' />
                                 <field name='idenfitication_image_back' widget='image' />
@@ -94,14 +91,13 @@
                                         <field name="km_home_work" />
                                     </group>
                                     <group>
-                                        <field name="departure_reason" />
-                                        <field name="departure_description" />
+                                        <field name="departured" options="{'no_open': True, 'no_create': True}" />
                                     </group>
                                 </group>
                                 <label for="notes" />
                                 <field name="notes" />
                             </page>
-                            <page string="Información bancaria" groups="hcs_bm_sudameris.group_bm_bank">
+                            <page string="Información bancaria" groups="hcs_bm.group_bm_bank">
                                 <group>
                                     <group>
                                         <field name="branch_number" readonly="1" />
@@ -140,15 +136,18 @@
                 <search string="Filtrar movimientos">
                     <field name="name" string="Funcionarios" filter_domain="['|', '|', ('name_first', 'ilike', self), ('name_second', 'ilike', self), '|', ('surname_first', 'ilike', self), ('surname_second', 'ilike', self)]" />
                     <field name="identification_id" />
-                    <field name="category_ids" />
-                    <field name="job_id" />
+                    <field name="account_name" />
                     <separator />
                     <filter name="state" string="Borrador" domain="[('state', '=', 'draft')]" />
                     <filter name="state" string="En proceso de alta" domain="[('state', '=', 'check')]" />
                     <filter name="state" string="Listo" domain="[('state', '=', 'ready')]" />
                     <filter name="state" string="Revisar" domain="[('state', '=', 'error')]" />
                     <separator />
+                    <filter name="reliable_base" string="Sin Validar" domain="[('reliable_base', '=', False)]" />
                     <filter name="reliable_base" string="Validado" domain="[('reliable_base', '=', True)]" />
+                    <separator />
+                    <filter name="account_number" string="Sin cuenta" domain="[('account_number', '=', None)]" />
+                    <filter name="account_number" string="Con cuenta" domain="[('account_number', '!=', None)]" />
                     <separator />
                     <filter name="inactive" string="Archivados" domain="[('active', '=', False)]" />
                     <group expand="0" string="Group By">
@@ -190,6 +189,17 @@
             <field name="state">code</field>
             <field name="code">
                 action = record.valid_client_reliable_base()
+            </field>
+        </record>
+
+        <record id="action_official_valid_client_owns_account" model="ir.actions.server">
+            <field name="name">Verificar cuenta</field>
+            <field name="model_id" ref="model_bm_official" />
+            <field name="binding_model_id" ref="model_bm_official" />
+            <field name="binding_view_types">list,form</field>
+            <field name="state">code</field>
+            <field name="code">
+                action = record.client_owns_account()
             </field>
         </record>
 
