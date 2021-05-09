@@ -7,12 +7,6 @@ import logging, json, requests
 _logger = logging.getLogger(__name__)
 
 
-class BM_OfficialSalary_Wizard(models.TransientModel):
-  _name = "bm.official.salary.wizard"
-  _description = "Wizard: Movimiento de salario del funcionaro"
-  message = fields.Text(readonly=True, store=False)
-
-
 class BM_OfficialSalary(models.Model):
   _name = 'bm.official.salary'
   _description = 'Movimiento de salario del funcionaro'

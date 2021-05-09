@@ -67,29 +67,6 @@
             </field>
         </record>
 
-        <record id="official_salary_wizard_form_view" model="ir.ui.view">
-            <field name="name">bm.official.salary.wizard.form.view</field>
-            <field name="model">bm.official.salary.wizard</field>
-            <field name="arch" type="xml">
-                <form string="Alert form">
-                    <group col="2" colspan="4">
-                        <field name="message" nolabel="1"/>
-                    </group>
-                    <footer>
-                        <button string="Cerrar" class="oe_highlight" special="cancel" />
-                    </footer>
-                </form>
-            </field>
-        </record>
-
-        <record id="action_official_salary_wizard " model="ir.actions.act_window">
-            <field name="name">Mensaje</field>
-            <field name="type">ir.actions.act_window</field>
-            <field name="res_model">bm.official.salary.wizard</field>
-            <field name="view_mode">form</field>
-            <field name="domain">[]</field>
-        </record>
-
         <record id="action_official_salary_aproved" model="ir.actions.server">
             <field name="name">Aprobar</field>
             <field name="model_id" ref="model_bm_official_salary" />

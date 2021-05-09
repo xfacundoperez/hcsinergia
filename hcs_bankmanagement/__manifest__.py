@@ -5,10 +5,10 @@
 
     'category': 'Human Resources/Employees',
 
-    'summary': 'Centraliza la información de funcionarios por compañias',
+    'summary': 'Centraliza la información de funcionarios por compañias asociadas',
 
     'description': """
-        Centraliza la información de funcionarios por compañias
+        Centraliza la información de funcionarios por compañias asociadas
         
         Organizá la plantilla de funcionarios y salarios por compañía asociada al banco
     """,
@@ -21,6 +21,7 @@
         'security/security.xml',
         'security/ir.model.access.csv',
         'wizard/bm_official_wizard_views.xml',
+        'wizard/bm_official_salary_wizard_views.xml',
         'views/assets.xml',
         'views/webclient_templates.xml',
         'views/res_country.xml',
