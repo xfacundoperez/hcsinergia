@@ -4,7 +4,7 @@
             <field name="name">bm.official.salary.tree.view</field>
             <field name="model">bm.official.salary</field>
             <field name="arch" type="xml">
-                <tree string="Movimientos de salario">
+                <tree string="Movimientos de salario" default_order='state' decoration-warning="state=='draft'" decoration-info="state=='check'" decoration-primary="state=='aproved'" decoration-danger="state=='cancel'" decoration-success="state=='done'">
                     <field name="official" />
                     <field name="identification_id" />
                     <field name="official_gross_salary" />
@@ -23,13 +23,14 @@
             <field name="arch" type="xml">
                 <form string="Movimientos de salario">
                     <header>
-                        <button name="btn_aprobar" string="Aprobar" confirm="¿Estás seguro que deseas aprobar este registro? Verifique el salario antes de aceptar" states="preliquidacion" class="oe_highlight" groups="hr.group_hr_manager" type="object" />
-                        <button name="btn_preliquidacion" string="Volver a borrador" confirm="¿Estás seguro que deseas volver este registro a borrador? Verifique el salario antes de aceptar" states="aprobado" class="oe_highlight" type="object" />
-                        <field name="state" widget="statusbar" statusbar_visible="preliquidacion,aprobado,enproceso,cancelado,liquidado" statusbar_colors='{"cancelado":"red","aprobado":"blue","liquidado":"green"}' />
+                        <button name="btn_aprobar" string="Aprobar" confirm="¿Estás seguro que deseas aprobar este registro? Verifique el salario antes de aceptar" states="draft" class="oe_highlight" type="object" />
+                        <button name="btn_draft" string="Volver a Preliquilación" confirm="¿Estás seguro que deseas volver este registro a borrador? Verifique el salario antes de aceptar" states="aproved" class="oe_highlight" type="object" />
+                        <field name="state" widget="statusbar" statusbar_visible="draft,aproved,check,cancel,done" />
                     </header>
                     <sheet>
+                        <field name="company_id" invisible="1" />
                         <group string="Información del funcionario">
-                            <field name="identification_id" attrs="{'readonly':[('state', '!=', 'preliquidacion')]}" />
+                            <field name="identification_id" attrs="{'readonly':[('state', '!=', 'draft')]}" />
                             <field name="official" required="True" />
                             <field name="currency_type" />
                             <field name="official_gross_salary" />
@@ -100,14 +101,14 @@
             </field>
         </record>
 
-        <record id="action_official_salary_generate" model="ir.actions.server">
-            <field name="name">Generar archivo .TXT</field>
+        <record id="action_official_salary_create_file" model="ir.actions.server">
+            <field name="name">Generar archivo de pago (TXT)</field>
             <field name="model_id" ref="model_bm_official_salary" />
             <field name="binding_model_id" ref="model_bm_official_salary" />
             <field name="binding_view_types">list</field>
             <field name="state">code</field>
             <field name="code">
-                action = records.generar_pago()
+                action = records.create_file_txt()
             </field>
         </record>
 

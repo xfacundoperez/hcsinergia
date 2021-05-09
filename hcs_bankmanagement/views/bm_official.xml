@@ -27,9 +27,9 @@
                     <field name="company_id" invisible="1" />
                     <header attrs="{'invisible': [('id', '=', False)]}">
                         <button name="button_aprove" string="Aprobar" confirm="¿Estás seguro que deseas aprobar este registro? El funcionario quedará a espera de alta de cuenta" states="draft" class="oe_highlight oe_read_only" type="object" />
-                        <button name="button_draft" string="Volver a borrador" confirm="¿Estás seguro que deseas volver este registro a borrador?" states="check" class="oe_highlight oe_read_only" type="object" />
+                        <button name="button_draft" string="Revertir" confirm="¿Estás seguro que deseas volver este registro a borrador?" states="check" class="oe_highlight oe_read_only" type="object" />
                         <button name="button_reset" string="Reiniciar" confirm="¿Estás seguro que deseas volver este registro a En Proceso?" states="error,ready" class="oe_highlight oe_read_only" type="object" />
-                        <field name="state" widget="statusbar" statusbar_visible="draft,check,error,ready" statusbar_colors='{"draft":"orange", "check":"blue", "error":"red", "ready":"green"}' />
+                        <field name="state" widget="statusbar" statusbar_visible="draft,check,ready" />
                     </header>
                     <sheet>
                         <widget name="web_ribbon" title="Archived" bg_color="bg-danger" attrs="{'invisible': [('active', '=', True)]}"/>
@@ -138,7 +138,8 @@
             <field name="model">bm.official</field>
             <field name="arch" type="xml">
                 <search string="Filtrar movimientos">
-                    <field name="name" string="Funcionarios" filter_domain="['|', ('work_email', 'ilike', self), ('name', 'ilike', self)]" />
+                    <field name="name" string="Funcionarios" filter_domain="['|', '|', ('name_first', 'ilike', self), ('name_second', 'ilike', self), '|', ('surname_first', 'ilike', self), ('surname_second', 'ilike', self)]" />
+                    <field name="identification_id" />
                     <field name="category_ids" />
                     <field name="job_id" />
                     <separator />
@@ -146,6 +147,8 @@
                     <filter name="state" string="En proceso de alta" domain="[('state', '=', 'check')]" />
                     <filter name="state" string="Listo" domain="[('state', '=', 'ready')]" />
                     <filter name="state" string="Revisar" domain="[('state', '=', 'error')]" />
+                    <separator />
+                    <filter name="reliable_base" string="Validado" domain="[('reliable_base', '=', True)]" />
                     <separator />
                     <filter name="inactive" string="Archivados" domain="[('active', '=', False)]" />
                     <group expand="0" string="Group By">
@@ -165,6 +168,39 @@
                         </searchpanel>
                     -->
                 </search>
+            </field>
+        </record>
+
+        <record id="action_official_aprove" model="ir.actions.server">
+            <field name="name">Aprobar</field>
+            <field name="model_id" ref="model_bm_official" />
+            <field name="binding_model_id" ref="model_bm_official" />
+            <field name="binding_view_types">list,form</field>
+            <field name="state">code</field>
+            <field name="code">
+                action = record.button_aprove()
+            </field>
+        </record>
+
+        <record id="action_official_valid_client_reliable_base" model="ir.actions.server">
+            <field name="name">Validar</field>
+            <field name="model_id" ref="model_bm_official" />
+            <field name="binding_model_id" ref="model_bm_official" />
+            <field name="binding_view_types">list,form</field>
+            <field name="state">code</field>
+            <field name="code">
+                action = record.valid_client_reliable_base()
+            </field>
+        </record>
+
+        <record id="action_official_create_officials_salary" model="ir.actions.server">
+            <field name="name">Crear movimientos de salarios</field>
+            <field name="model_id" ref="model_bm_official" />
+            <field name="binding_model_id" ref="model_bm_official" />
+            <field name="binding_view_types">list</field>
+            <field name="state">code</field>
+            <field name="code">
+                action = record.create_officials_salary()
             </field>
         </record>
 

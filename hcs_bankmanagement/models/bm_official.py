@@ -3,6 +3,7 @@ import base64
 from odoo import fields, models, api, _
 from odoo.modules.module import get_module_resource
 from datetime import datetime, date
+from odoo.exceptions import ValidationError
 
 #import logging
 #_logger = logging.getLogger(__name__)
@@ -126,10 +127,10 @@ class BM_Official(models.Model):
     category_ids = fields.Many2many('bm.official.category', 'official_category_rel', 'official_id', 'category_id', string='Etiquetas')
     active = fields.Boolean("Active", default=True)
     state = fields.Selection([
-        ('check', 'En proceso de alta'),
         ('draft', 'Borrador'),
-        ('ready', 'Listo'),
-        ('error', 'Revisar')],
+        ('check', 'En proceso de alta'),
+        ('error', 'Revisar'),
+        ('ready', 'Listo')],
         string="Estado", default='draft')
     reliable_base = fields.Boolean(
         string="Validación", default=False, readonly=True)
@@ -178,7 +179,6 @@ class BM_Official(models.Model):
         for official in self:
             if official.account_number:
                 official.state = 'ready'
-                official.reliable_base = True
 
             _nombre = official.name_first
             if (official.name_second):
@@ -260,11 +260,14 @@ class BM_Official(models.Model):
     def button_aprove(self):
         # get officials selected
         officials = self.env['bm.official'].browse(self._context.get('active_ids')) or self
-        # list errors
-        _errors = []
+        _ready_count = 0
+        # loop officials
         for official in officials:
             # if official has account, validate next one
             if official.reliable_base:
+                continue
+            # if official is already checked or ready
+            if official.state in ['check', 'ready']:
                 continue
             # if official has not idenfitication_image or idenfitication_image_pdf, store error and go to next one
             #if not (official.idenfitication_image_front or official.idenfitication_image_back or official.idenfitication_image_pdf):
@@ -274,8 +277,10 @@ class BM_Official(models.Model):
             # if its ok, change state
             if official.state == 'draft':
                 official.state = 'check'
-        if len(_errors):
-            return self.show_message('Se encontraron los siguientes errores', '{}'.format('\n'.join(_errors)))
+                _ready_count += 1
+        if _ready_count > 1:
+            return self.show_message('Aprobar', 'Se aprobaron {} funcionarios'.format(_ready_count))
+
 
     def button_draft(self):
         for official in self:
@@ -292,25 +297,41 @@ class BM_Official(models.Model):
                 official.reliable_base = False
                 official.state = 'check'
 
-    def create_officials_salary(self):
-        _count_ok = 0
-        _errors = []
+    def create_officials_salary(self):                
+        func_result = {
+            'has_payment': [],
+            'payment': '',
+            'count_ok': 0
+        }
         officials_salary = self.env['bm.official.salary']
         # Obtengo los funcionarios seleccionados
-        for official in self.env['bm.official'].browse(self._context.get('active_ids')) or self:
-            _create = True
-            if official.gross_salary == 0:
-                return self.show_message('Movimiento de salarios', 'El funcionario {} no tiene salario'.format(official.name))
-            if official.state == 'ready':
-                for official_salary in officials_salary.search([('official.id', '=', official.id)]):
-                    # if exist official salary for actual month, continue to next one
-                    if datetime.now().month == official_salary.payment_date.month:
-                        _errors.append(
-                            '{} ya posee registro'.format(official.name))
-                        continue
-                    officials_salary.create({
-                        'identification_id': official.identification_id
-                    })
-                    _count_ok += 1
-        if _count_ok > 0:
-            return self.show_message('Movimiento de salarios', 'Se crearon {} movimientos'.format(_count_ok))
+        for official in self.env['bm.official'].search([
+                '&',
+                '&', 
+                ('id', 'in', self._context.get('active_ids')), 
+                ('state', 'in', ['ready']),
+                '&', 
+                ('account_number', '!=', False),
+                ('account_name', '!=', False),
+                '&', 
+                ('gross_salary', '>', 0),
+                ('reliable_base', '=', True)
+            ]):
+            _create_official_salary = True
+            #Get the last movement and check if in 35 range and is paid
+            for official_salary in officials_salary.search([('official.id', '=', official.id)], order='id desc', limit=1):
+                #if exist official salary for las 35 day
+                diference_days = (datetime.now().date() - official_salary.payment_date).days
+                if diference_days <= 35:
+                    func_result['has_payment'].append('{}: {} dias'.format(official.name, diference_days))
+                    #_changes.append('{} ya posee registro'.format(official.name))
+                    _create_official_salary = False
+            if _create_official_salary:
+                officials_salary.create({
+                    'identification_id': official.identification_id
+                })
+                func_result['count_ok'] += 1
+        #if _ready_count > 0:
+        if len(func_result['has_payment']) > 0:
+            func_result['payment'] = '\nLos siguientes funcionarios ya poseen registros validos:\n{}'.format('\n'.join(func_result['has_payment']))
+        return self.show_message('Movimiento de salarios', 'Se crearon {} movimientos.\n{}'.format(func_result['count_ok'], func_result['payment']))

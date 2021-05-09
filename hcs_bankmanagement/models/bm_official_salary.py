@@ -38,14 +38,15 @@ class BM_OfficialSalary(models.Model):
       ('21', 'Débito Caja de Ahorro')], string="Modalidad de pago", default="21")
   operation_type = fields.Char(string="Tipo de Operación")
   operation_code = fields.Char(string="Operación")
+  company_id = fields.Many2one('res.company', required=True, default=lambda self: self.env.company)
   suboperacion_code = fields.Char(string="Suboperación")
   reference = fields.Char(string="Referencia")
   state = fields.Selection([
-      ('preliquidacion', 'Preliquidación'),
-      ('aprobado', 'Aprobado'),
-      ('enproceso', 'En Proceso'),
-      ('cancelado', 'Cancelado'),
-      ('liquidado', 'Liquidado')], string="Estado", default='preliquidacion')
+      ('draft', 'Preliquidación'),
+      ('aproved', 'Aprobado'),
+      ('check', 'En Proceso'),
+      ('cancel', 'Cancelado'),
+      ('done', 'Liquidado')], string="Estado", default='draft')
 
   def show_message(self, title, message):
     return {
@@ -76,17 +77,15 @@ class BM_OfficialSalary(models.Model):
       if official_salary.identification_id:
         for official in self.env['bm.official'].search([('identification_id', '=', official_salary.identification_id)]):
           official_salary.official = official
-          official_salary.amount_to_pay = official.gross_salary
-
-        
+          official_salary.amount_to_pay = official.gross_salary        
     
   def btn_aprobar(self):
     for official_salary in self:
-      official_salary.state = 'aprobado'
+      official_salary.state = 'aproved'
       
-  def btn_preliquidacion(self):
+  def btn_draft(self):
     for official_salary in self:
-      official_salary.state = 'preliquidacion'
+      official_salary.state = 'draft'
 
   # Hacer funcion async para obtener la respuesta
   def obtener_token(self):
@@ -110,16 +109,16 @@ class BM_OfficialSalary(models.Model):
     # Siempre retorno el token valido
     return sudameris_auth
 
-  def generar_pago(self):
+  def create_file_txt(self):
     _ids = []
     # Obtengo los movimientos seleccionados
     for official_salary in self.env['bm.official.salary'].browse(self._context.get('active_ids')):
-      if official_salary.state == 'aprobado':
+      if official_salary.state == 'aproved':
         _ids.append('{}'.format(official_salary.id))
     if _ids:
       return {
         'type': 'ir.actions.act_url',
-        'url': '/web/binary_text/crear_txt?ids={}'.format(','.join(_ids)),
+        'url': '/web/binary_text/create_file_txt?ids={}'.format(','.join(_ids)),
         'target': 'self'
       }
     else:

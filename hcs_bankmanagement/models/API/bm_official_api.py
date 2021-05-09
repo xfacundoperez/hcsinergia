@@ -1,40 +1,41 @@
 from odoo import fields, models, api, _
-#from odoo.exceptions import ValidationError
+from odoo.exceptions import ValidationError
+from random import randint
 
 #import logging
 #_logger = logging.getLogger(__name__)
 
 
 class BM_OfficialApi(models.Model):
-    _name = "bm.official.api"
     _inherit = "bm.official"
 
-    def valid_client_reliable_base(self):
-        return self.show_message('TEST OK')
+    def valid_client_reliable_base(self, *args):
+        # Checkeo que el usuario actual tiene el permiso del banco
+        if not self.env.user.has_group('hcs_bankmanagement.group_bm_bank') and not args:
+            return self.show_message('Validar', 'Usted no tiene permiso para ejecutar esta opción')
+
+        # Get officials in check and not reliable_base or ready, error and not reliable_base
+        _search = ['&', ('state', 'in', ['check', 'ready', 'error']), ('reliable_base', '=', False)]
+        
+        # If are active_ids, search it only
+        active_ids = self._context.get('active_ids')
+        if active_ids:
+            _search = ['&', '&', ('id', 'in', active_ids), ('state', 'in', ['check', 'ready', 'error']), ('reliable_base', '=', False)]
+
         _changes = []
-        # Creo la clase y le paso como parametro ir.config_parameter como sudo
-        _config_parameter = self.env['ir.config_parameter'].sudo()
-        sudamerisApi = SudamerisApiBase(_config_parameter)
-        # Obtengo la lista de funcionarios seleccionados
-        for official in self.env['bm.official'].browse(self._context.get('active_ids')) or self:
-            # Hago la consulta a la API
-            result = sudamerisApi.ws_valida_reliable_base(
-                official.country_id.name,
-                official.identification_type,
-                official.identification_id,
-                official.name_first,
-                official.name_second,
-                official.surname_first,
-                official.surname_second,
-                official.birthday
-            )
-            official.reliable_base = result[0]
-            if result[0] == True:
-                self.cliente_posee_cuenta()
+        _ready_count = 0
+        for official in self.env['bm.official'].search(_search):
+            for _ in range(2):
+                official.reliable_base = bool(randint(0, 1))
+            if official.reliable_base:
+                official.state = 'ready' 
+                _ready_count += 1
             else:
-                _changes.append('{}: {}'.format(official.name, result[1]))
-        if len(_changes):
-            return self.show_message('Cliente Valida Base Confiable: Se encontraron los siguientes errores', '\n'.join(_changes))
+                _changes.append('{} No se pudo validar su identidad'.format(official.name))
+        if _ready_count > 1:
+            _changes.append('Se validaron {} funcionarios'.format(_ready_count))
+        if len(_changes) and not args:
+            return self.show_message('Validar', '\n'.join(_changes))
 
     def client_owns_account(self):
         # Checkeo que el usuario actual
