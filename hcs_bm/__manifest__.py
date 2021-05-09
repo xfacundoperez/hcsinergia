@@ -24,7 +24,6 @@
         'wizard/bm_official_salary_wizard_views.xml',
         'views/assets.xml',
         'views/webclient_templates.xml',
-        'views/website_templates.xml',
         'views/res_country.xml',
         'views/bm_official.xml',
         'views/bm_official_salary.xml',

@@ -1,9 +1,0 @@
-<odoo>
-    <data>
-        <template id="hcs_bm_sudameris_web_layout" inherit_id="web.layout" name="hcs_bm_sudameris_layout" priority="17">
-            <xpath expr="//head//link" position="after">
-                <link rel="shortcut icon" href="/hcs_bm_sudameris/static/src/img/favicon.ico" type="image/x-icon"/>
-            </xpath>
-        </template>
-    </data>
-</odoo>
