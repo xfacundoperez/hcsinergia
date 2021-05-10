@@ -29,7 +29,7 @@ class BM_Official(models.Model):
         ('male', 'Hombre'),
         ('female', 'Mujer'),
         ('other', 'Otro')
-    ], "Genero", default="male", tracking=True)
+    ], "Sexo", default="male", tracking=True)
     marital = fields.Selection([
         ('single', 'Soltero(a)'),
         ('married', 'Casado(a)'),
@@ -37,7 +37,7 @@ class BM_Official(models.Model):
         ('widower', 'Viudo(a)'),
         ('divorced', 'Divorciado(a)')
     ], string='Estado Civil', default='single', tracking=True)
-    identification_id = fields.Char(string='Cedula de identidad', tracking=True)
+    identification_id = fields.Char(string='N° de cedula', tracking=True)
     identification_type = fields.Selection([
         ('1', 'CEDULA DE IDENTIDAD'),
         ('2', 'CREDENCIAL CIVICA'),
@@ -51,14 +51,14 @@ class BM_Official(models.Model):
         ('16', 'CARNET-INMIGRACIONES'),
         ('98', 'No Registra'),
         ('99', 'Inst. Financieras'),
-        ('20', 'REPRES.DIPLOMATICAS')], string="Tipo de identificación", digits=(2), default="1")
-    identification_expiry = fields.Date(string="Vencimiento de identificación")
-    country = fields.Many2one('res.country', 'Nacionalidad (País)', tracking=True)
+        ('20', 'REPRES.DIPLOMATICAS')], string="Tipo de Documento", digits=(2), default="1")
+    identification_expiry = fields.Date(string="Vencimiento de Cedula")
+    country = fields.Many2one('res.country', 'Nacionalidad', tracking=True)
     city = fields.Many2one('res.country.state', 'Ciudad', domain="[('country_id', '=?', country)]", required=True)
     department = fields.Many2one('res.country.departament', 'Departamento', domain="[('state_id', '=?', city)]", required=True)
     neighborhood = fields.Many2one('res.country.neighborhood', 'Barrio', domain="[('departament_id', '=?', department)]", required=True)
-    real_address = fields.Char(string="Domicilio real", digits=(50), required=True)
-    house_no = fields.Integer(string="Numero de Casa", digits=(3), required=True)
+    real_address = fields.Char(string="Dirección", digits=(50), required=True)
+    house_no = fields.Integer(string="N° Casa", digits=(3), required=True)
     street_transversal = fields.Char(string="Calle Transversal", digits=(35))
     address_code = fields.Integer(default=1, digits=(3))
     birthday = fields.Date('Fecha de nacimiento', tracking=True)
@@ -67,14 +67,16 @@ class BM_Official(models.Model):
 
     # contact
     email = fields.Char('E-mail')
-    work_phone = fields.Char('Work Phone', compute="_compute_phones", store=True, readonly=False)
-    mobile_phone = fields.Char('Work Mobile')
+    work_phone = fields.Char('Telefono Laboral', compute="_compute_phones", store=True, readonly=False)
+    particular_phone = fields.Char('Telefono Particular')
+    mobile_phone = fields.Char('Telefono Celular')
     idenfitication_image_front = fields.Binary(
         string="Cédula de Identidad (Frente)", max_width=100, max_height=100)
     idenfitication_image_back = fields.Binary(
         string="Cédula de Identidad (Dorso)", max_width=100, max_height=100)
     idenfitication_image_pdf = fields.Binary(string="Cédula de Identidad (PDF)")
     idenfitication_image_pdf_name = fields.Char(string="Nombre de cédula de identidad (PDF)")
+    reference = fields.Text('Referencia')
     image_1920 = fields.Image(default=_default_image)
 
     # Bank info
@@ -84,7 +86,7 @@ class BM_Official(models.Model):
     currency_type = fields.Selection([
         ('6900', 'Guaraníes'),
         ('1', 'Dólares Americanos')], string="Tipo de moneda", default="6900")
-    gross_salary = fields.Float(string="Salario", digits=(18, 2))
+    gross_salary = fields.Float(string="Salario Bruto", digits=(18, 2))
     group_type = fields.Selection([
         ('90', 'Payroll'),
         ('94', 'Proveedores')], string="Tipo de Grupo", digits=(3), default="90")
