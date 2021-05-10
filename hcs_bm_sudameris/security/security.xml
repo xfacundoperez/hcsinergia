@@ -33,11 +33,11 @@
             <field name="domain_force">['|',('company_id','=',False),('company_id', 'in', company_ids)]</field>
         </record>
 
-        <!-- <record id="bm_official_salary_multi_comp_rule" model="ir.rule">
+        <record id="bm_official_salary_multi_comp_rule" model="ir.rule">
             <field name="name">Official Salary multi company rule</field>
             <field name="model_id" ref="model_bm_official_salary"/>
             <field name="domain_force">['|',('company_id','=',False),('company_id', 'in', company_ids)]</field>
-        </record> -->
+        </record>
 
         <record id="bm_deptartment_multi_comp_rule" model="ir.rule">
             <field name="name">Department multi company rule</field>

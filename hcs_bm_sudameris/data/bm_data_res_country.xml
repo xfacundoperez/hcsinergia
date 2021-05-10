@@ -1,12 +1,350 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data noupdate="1">
+        <!-- Añado los codigos de paises-->
+        <record id="base.af" model="res.country">
+            <field name="code_number">13</field>
+        </record>
+        <record id="base.al" model="res.country">
+            <field name="code_number">17</field>
+        </record>
+        <record id="base.de" model="res.country">
+            <field name="code_number">23</field>
+        </record>
+        <record id="base.ad" model="res.country">
+            <field name="code_number">37</field>
+        </record>
+        <record id="base.ao" model="res.country">
+            <field name="code_number">40</field>
+        </record>
+        <record id="base.sa" model="res.country">
+            <field name="code_number">53</field>
+        </record>
+        <record id="base.dz" model="res.country">
+            <field name="code_number">59</field>
+        </record>
+        <record id="base.ar" model="res.country">
+            <field name="code_number">63</field>
+        </record>
+        <record id="base.au" model="res.country">
+            <field name="code_number">39</field>
+        </record>
+        <record id="base.at" model="res.country">
+            <field name="code_number">72</field>
+        </record>
+        <record id="base.bd" model="res.country">
+            <field name="code_number">81</field>
+        </record>
+        <record id="base.bb" model="res.country">
+            <field name="code_number">83</field>
+        </record>
+        <record id="base.bm" model="res.country">
+            <field name="code_number">90</field>
+        </record>
+        <record id="base.mm" model="res.country">
+            <field name="code_number">93</field>
+        </record>
+        <record id="base.bo" model="res.country">
+            <field name="code_number">97</field>
+        </record>
+        <record id="base.br" model="res.country">
+            <field name="code_number">105</field>
+        </record>
+        <record id="base.bg" model="res.country">
+            <field name="code_number">111</field>
+        </record>
+        <record id="base.bi" model="res.country">
+            <field name="code_number">115</field>
+        </record>
+        <record id="base.kh" model="res.country">
+            <field name="code_number">141</field>
+        </record>
+        <record id="base.td" model="res.country">
+            <field name="code_number">203</field>
+        </record>
+        <record id="base.cl" model="res.country">
+            <field name="code_number">211</field>
+        </record>
+        <record id="base.cn" model="res.country">
+            <field name="code_number">215</field>
+        </record>
+        <record id="base.cy" model="res.country">
+            <field name="code_number">221</field>
+        </record>
+        <record id="base.co" model="res.country">
+            <field name="code_number">169</field>
+        </record>
+        <record id="base.cg" model="res.country">
+            <field name="code_number">177</field>
+        </record>
+        <record id="base.kp" model="res.country">
+            <field name="code_number">187</field>
+        </record>
+        <record id="base.kr" model="res.country">
+            <field name="code_number">190</field>
+        </record>
+        <record id="base.cr" model="res.country">
+            <field name="code_number">196</field>
+        </record>
+        <record id="base.ci" model="res.country">
+            <field name="code_number">193</field>
+        </record>
+        <record id="base.cu" model="res.country">
+            <field name="code_number">199</field>
+        </record>
+        <record id="base.dk" model="res.country">
+            <field name="code_number">232</field>
+        </record>
+        <record id="base.ec" model="res.country">
+            <field name="code_number">239</field>
+        </record>
+        <record id="base.eg" model="res.country">
+            <field name="code_number">240</field>
+        </record>
+        <record id="base.sv" model="res.country">
+            <field name="code_number">242</field>
+        </record>
+        <record id="base.es" model="res.country">
+            <field name="code_number">245</field>
+        </record>
+        <record id="base.us" model="res.country">
+            <field name="code_number">249</field>
+        </record>
+        <record id="base.ph" model="res.country">
+            <field name="code_number">267</field>
+        </record>
+        <record id="base.fi" model="res.country">
+            <field name="code_number">271</field>
+        </record>
+        <record id="base.fr" model="res.country">
+            <field name="code_number">275</field>
+        </record>
+        <record id="base.gm" model="res.country">
+            <field name="code_number">285</field>
+        </record>
+        <record id="base.gh" model="res.country">
+            <field name="code_number">289</field>
+        </record>
+        <record id="base.gi" model="res.country">
+            <field name="code_number">293</field>
+        </record>
+        <record id="base.gr" model="res.country">
+            <field name="code_number">301</field>
+        </record>
+        <record id="base.gl" model="res.country">
+            <field name="code_number">305</field>
+        </record>
+        <record id="base.gu" model="res.country">
+            <field name="code_number">313</field>
+        </record>
+        <record id="base.gt" model="res.country">
+            <field name="code_number">317</field>
+        </record>
+        <record id="base.gf" model="res.country">
+            <field name="code_number">325</field>
+        </record>
+        <record id="base.gn" model="res.country">
+            <field name="code_number">329</field>
+        </record>
+        <record id="base.gq" model="res.country">
+            <field name="code_number">331</field>
+        </record>
+        <record id="base.nl" model="res.country">
+            <field name="code_number">573</field>
+        </record>
+        <record id="base.hn" model="res.country">
+            <field name="code_number">345</field>
+        </record>
+        <record id="base.hk" model="res.country">
+            <field name="code_number">351</field>
+        </record>
+        <record id="base.in" model="res.country">
+            <field name="code_number">361</field>
+        </record>
+        <record id="base.id" model="res.country">
+            <field name="code_number">365</field>
+        </record>
+        <record id="base.iq" model="res.country">
+            <field name="code_number">369</field>
+        </record>
+        <record id="base.is" model="res.country">
+            <field name="code_number">379</field>
+        </record>
+        <record id="base.il" model="res.country">
+            <field name="code_number">383</field>
+        </record>
+        <record id="base.it" model="res.country">
+            <field name="code_number">386</field>
+        </record>
+        <record id="base.jm" model="res.country">
+            <field name="code_number">391</field>
+        </record>
+        <record id="base.jo" model="res.country">
+            <field name="code_number">403</field>
+        </record>
+        <record id="base.ke" model="res.country">
+            <field name="code_number">410</field>
+        </record>
+        <record id="base.kw" model="res.country">
+            <field name="code_number">413</field>
+        </record>
+        <record id="base.la" model="res.country">
+            <field name="code_number">420</field>
+        </record>
+        <record id="base.ls" model="res.country">
+            <field name="code_number">426</field>
+        </record>
+        <record id="base.lr" model="res.country">
+            <field name="code_number">434</field>
+        </record>
+        <record id="base.ly" model="res.country">
+            <field name="code_number">438</field>
+        </record>
+        <record id="base.lu" model="res.country">
+            <field name="code_number">445</field>
+        </record>
+        <record id="base.mo" model="res.country">
+            <field name="code_number">447</field>
+        </record>
+        <record id="base.mg" model="res.country">
+            <field name="code_number">450</field>
+        </record>
+        <record id="base.my" model="res.country">
+            <field name="code_number">455</field>
+        </record>
+        <record id="base.mw" model="res.country">
+            <field name="code_number">458</field>
+        </record>
+        <record id="base.mv" model="res.country">
+            <field name="code_number">461</field>
+        </record>
+        <record id="base.ml" model="res.country">
+            <field name="code_number">464</field>
+        </record>
+        <record id="base.mt" model="res.country">
+            <field name="code_number">467</field>
+        </record>
+        <record id="base.ma" model="res.country">
+            <field name="code_number">474</field>
+        </record>
+        <record id="base.mq" model="res.country">
+            <field name="code_number">477</field>
+        </record>
+        <record id="base.mu" model="res.country">
+            <field name="code_number">485</field>
+        </record>
+        <record id="base.mr" model="res.country">
+            <field name="code_number">488</field>
+        </record>
+        <record id="base.mz" model="res.country">
+            <field name="code_number">505</field>
+        </record>
+        <record id="base.nr" model="res.country">
+            <field name="code_number">508</field>
+        </record>
+        <record id="base.np" model="res.country">
+            <field name="code_number">517</field>
+        </record>
+        <record id="base.ni" model="res.country">
+            <field name="code_number">521</field>
+        </record>
+        <record id="base.ng" model="res.country">
+            <field name="code_number">528</field>
+        </record>
+        <record id="base.no" model="res.country">
+            <field name="code_number">538</field>
+        </record>
+        <record id="base.nc" model="res.country">
+            <field name="code_number">542</field>
+        </record>
+        <record id="base.py" model="res.country">
+            <field name="code_number">586</field>
+        </record>
+        <record id="base.pf" model="res.country">
+            <field name="code_number">599</field>
+        </record>
+        <record id="base.pl" model="res.country">
+            <field name="code_number">603</field>
+        </record>
+        <record id="base.pt" model="res.country">
+            <field name="code_number">607</field>
+        </record>
+        <record id="base.pr" model="res.country">
+            <field name="code_number">611</field>
+        </record>
+        <record id="base.qa" model="res.country">
+            <field name="code_number">618</field>
+        </record>
+        <record id="base.uk" model="res.country">
+            <field name="code_number">628</field>
+        </record>
+        <record id="base.ro" model="res.country">
+            <field name="code_number">670</field>
+        </record>
+        <record id="base.sn" model="res.country">
+            <field name="code_number">728</field>
+        </record>
+        <record id="base.sc" model="res.country">
+            <field name="code_number">731</field>
+        </record>
+        <record id="base.sl" model="res.country">
+            <field name="code_number">735</field>
+        </record>
+        <record id="base.sg" model="res.country">
+            <field name="code_number">741</field>
+        </record>
+        <record id="base.sy" model="res.country">
+            <field name="code_number">744</field>
+        </record>
+        <record id="base.so" model="res.country">
+            <field name="code_number">748</field>
+        </record>
+        <record id="base.lk" model="res.country">
+            <field name="code_number">750</field>
+        </record>
+        <record id="base.se" model="res.country">
+            <field name="code_number">764</field>
+        </record>
+        <record id="base.ch" model="res.country">
+            <field name="code_number">767</field>
+        </record>
+        <record id="base.sr" model="res.country">
+            <field name="code_number">770</field>
+        </record>
+        <record id="base.th" model="res.country">
+            <field name="code_number">776</field>
+        </record>
+        <record id="base.tz" model="res.country">
+            <field name="code_number">780</field>
+        </record>
+        <record id="base.tg" model="res.country">
+            <field name="code_number">800</field>
+        </record>
+        <record id="base.tt" model="res.country">
+            <field name="code_number">815</field>
+        </record>
+        <record id="base.ug" model="res.country">
+            <field name="code_number">833</field>
+        </record>
+        <record id="base.uy" model="res.country">
+            <field name="code_number">845</field>
+        </record>
+        <record id="base.ve" model="res.country">
+            <field name="code_number">850</field>
+        </record>
+        <record id="base.vn" model="res.country">
+            <field name="code_number">855</field>
+        </record>
+        <record id="base.zm" model="res.country">
+            <field name="code_number">890</field>
+        </record>
+
         <!--Info: https://es.wikipedia.org/wiki/Asunci%C3%B3n#Barrios -->
         <!-- Añado Asunción a Paraguay -->
         <record id="bm_res_country_state_1" model="res.country.state">
             <field name="name">Asunsión</field>
             <field name="code">1</field>
-            <field name="country_id">185</field>
+            <field name="country_id" ref="base.py" />
         </record>
         <!-- Añado el departamento -->
         <record id="bm_res_country_dep_1" model="res.country.departament">

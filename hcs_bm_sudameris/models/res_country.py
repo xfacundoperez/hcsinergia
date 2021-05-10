@@ -1,7 +1,12 @@
 from odoo import models, fields
 
 
-class res_country_departament(models.Model):
+class BM_res_country(models.Model):
+  _inherit = "res.country"
+
+  code_number = fields.Integer()
+
+class BM_res_country_departament(models.Model):
   _name = "res.country.departament"
   
   name = fields.Char(string='Nombre del departamento', required=True)
@@ -13,7 +18,7 @@ class res_country_departament(models.Model):
   ]
 
 
-class res_country_neighborhood(models.Model):
+class BM_res_country_neighborhood(models.Model):
   _name = "res.country.neighborhood"
   
   name = fields.Char(string='Nombre del barrio', required=True)

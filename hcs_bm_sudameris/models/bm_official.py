@@ -129,6 +129,12 @@ class BM_Official(models.Model):
         string="Validación", default=False, readonly=True)
     departured = fields.Many2one('bm.official.departure', 'Licencia', compute="_compute_departured")
 
+    _sql_constraints = [
+        ('identification_id_uniq', 'unique(identification_id)', 'Ya existe otro funcionario con la misma cédula de identidad'),
+        ('account_number_uniq', 'unique(account_number)', 'Ya existe otro funcionario con el mismo número de cuenta'),
+    ]
+
+
     def show_message(self, title, message, *args):
         return {
             'name': title,
@@ -176,8 +182,12 @@ class BM_Official(models.Model):
     @api.onchange('name_first', 'name_second', 'surname_first', 'surname_second', 'account_number', 'state', 'reliable_base')
     def _on_change_name(self):
         for official in self:
-            if official.account_number:
-                official.state = 'ready'
+            # Check state of the official
+            if official.account_name or official.account_number:
+                if not official.reliable_base:
+                    official.state = 'error'
+                else:
+                    official.state = 'ready'
 
             _nombre = official.name_first
             if (official.name_second):

@@ -33,6 +33,7 @@
         'views/bm_job.xml',
         'views/bm_department.xml',
         'views/bm_views.xml',
+        'data/bm_data_config.xml',
         'data/bm_data_res_country.xml',
     ],
     'installable': True,
