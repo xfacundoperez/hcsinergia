@@ -1,8 +1,5 @@
 from datetime import datetime
-import requests
-import json
-import logging
-import random
+import json, requests, logging
 
 _logger = logging.getLogger(__name__)
 
@@ -20,8 +17,8 @@ class ApiWsAuthenticate:
   def get_token(self):
     expiration = self.config_parameter.get_param('sudameris.expiration')
     token      = self.config_parameter.get_param('sudameris.token')
-    # Si el momento actual es mayór a la fecha de expiración, renuevo las credenciales
-    if datetime.now() > datetime.strptime(expiration, '%Y-%m-%d %H:%M:%S'):
+    # El token es valido hasta las 23:59 del dia actual, si es mayor, se renueva
+    if datetime.now().date() > datetime.strptime(expiration, '%Y-%m-%d %H:%M:%S').date():
       # Como está vencido, actualizo el token
       try:
         new_auth = self.ws_authenticate()
@@ -35,7 +32,7 @@ class ApiWsAuthenticate:
   """
   Servicio: Authenticate
   Metodo: POST
-  URL: http://10.100.14.2:9280/bantotal/servlet/com.dlya.bantotal.odwsbt_Authenticate
+  URL: http://10.100.14.2:9280/bantotal/servlet/com.dlya.bantotal.odwsbt_Authenticate?Execute
   """
   def ws_authenticate(self, *args, **kwargs):
     """ Parametros
@@ -69,15 +66,22 @@ class ApiWsAuthenticate:
     Usuario externo no asociado al servicio en el canal |   10030
     Servicio mal configurado                            |   10031
     """
-    wsurl = self.base_url.replace("odwsbt_BSPayroll?", "odwsbt_Authenticate")
-    request_body = self.authenticate
+    wsurl = self.base_url.replace("odwsbt_BSPAYROOL?", "odwsbt_Authenticate?Execute")
+    request_body = json.dumps(self.authenticate)
     headers = {'Content-Type': 'application/json'} # set what your server accepts
     try:
-      #response = requests.post(wsurl, data=json.dumps(request_body), headers=headers, verify=False, timeout=10)
+      response = requests.post(wsurl, data=request_body, headers=headers, verify=False, timeout=10)
+      _logger.debug(['APIRESPONSE', response.text])
+      response = json.loads(response.text)
       new_auth = {
-        "token": "%018x" % random.getrandbits(80),
+        "token": response['SessionToken'],
+        "expiration": "{} {}".format(response['Btoutreq']['Fecha'], response['Btoutreq']['Hora']),
         "expiration": datetime.strftime(datetime.now(), '%Y-%m-%d %H:%M:%S')
       }
       return new_auth
     except:
-      return "Hubo un problema al conectarse al Banco, intente más tarde"
+      new_auth = {
+        "token": "TOKENINVALIDO",
+        "expiration": datetime.strftime(datetime.now(), '%Y-%m-%d %H:%M:%S')
+      }
+      return new_auth

@@ -40,12 +40,12 @@
                         </div>
                         <div class="oe_title oe_edit_only">
                             <h1 class="d-flex">
-                                <field name="surname_first" placeholder="Primer apellido" />
-                                <field name="surname_second" placeholder="Segundo apellido" />
-                            </h1>
-                            <h1 class="d-flex">
                                 <field name="name_first" placeholder="Primer nombre" />
                                 <field name="name_second" placeholder="Segundo nombre" />
+                            </h1>
+                            <h1 class="d-flex">
+                                <field name="surname_first" placeholder="Primer apellido" />
+                                <field name="surname_second" placeholder="Segundo apellido" />
                             </h1>
                             <!-- <h2>
                                 <field name="job_title" placeholder="Puesto de trabajo" />
@@ -62,7 +62,7 @@
                                 <field name="real_address" class="o_force_ltr" />
                                 <field name="neighborhood" class="o_force_ltr" attrs="{'readonly': [('department', '=', False)]}"  options='{"no_open": True, "no_create": True}' />
                                 <field name="city" class="o_address_city"  options='{"no_open": True, "no_create": True}' attrs="{'readonly': [('country', '=', False)]}" />
-                                <field name="work_phone" widget="phone" />
+                                <field name="work_phone" widget="phone" string="Teléfono Laboral" />
                                 <field name="contract_type" />
                                 <field name="gross_salary" />
                                 <field name="email" string="E-mail" widget="email" />
@@ -75,9 +75,7 @@
                                 <field name="marital" />
                                 <field name="house_no" class="o_force_ltr" widget="integer" />
                                 <field name="department" class="o_force_ltr" attrs="{'readonly': [('city', '=', False)]}"  options='{"no_open": True, "no_create": True}' />
-                                <field name="reference" />
-                                <field name="particular_phone" widget="phone" />
-                                <field name="mobile_phone" widget="phone" />
+                                <field name="mobile_phone" widget="phone" string="Teléfono personal" />
                                 <field name="job_id" options='{"no_open": True, "no_create": True}' />
                                 <separator />
                                 <field name='idenfitication_image_front' widget='image' />
@@ -139,6 +137,7 @@
                     <field name="name" string="Funcionarios" filter_domain="['|', '|', ('name_first', 'ilike', self), ('name_second', 'ilike', self), '|', ('surname_first', 'ilike', self), ('surname_second', 'ilike', self)]" />
                     <field name="identification_id" />
                     <field name="account_name" />
+                    <field name="account_number" />
                     <separator />
                     <filter name="state" string="Borrador" domain="[('state', '=', 'draft')]" />
                     <filter name="state" string="En proceso de alta" domain="[('state', '=', 'check')]" />
