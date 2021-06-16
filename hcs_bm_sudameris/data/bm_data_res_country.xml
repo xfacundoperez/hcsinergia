@@ -342,7 +342,7 @@
         <!--Info: https://es.wikipedia.org/wiki/Asunci%C3%B3n#Barrios -->
         <!-- Añado Asunción a Paraguay -->
         <record id="bm_res_country_state_1" model="res.country.state">
-            <field name="name">Asunsión</field>
+            <field name="name">Asunción</field>
             <field name="code">1</field>
             <field name="country_id" ref="base.py" />
         </record>

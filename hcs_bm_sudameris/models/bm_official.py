@@ -19,6 +19,22 @@ class BM_Official(models.Model):
         image_path = get_module_resource('hcs_bm_sudameris', 'static/src/img', 'default_image.png')
         return base64.b64encode(open(image_path, 'rb').read())
 
+    @api.model
+    def _default_country(self):
+        return self.env['res.country'].search([('code_number','=','586')],limit=1).id
+
+    @api.depends('welcome_kit', 'state')
+    def _compute_welcome_kit(self):
+        if self.state != 'ready':  # Solo si el funcionario no está listo, obtengo los kits y le asigno el kit minimo
+            _welcome_kit_selected = False
+            for kit in self.env['bm.product'].search([('product_type', '=', 'kit')], order='minimum_salary desc'):
+                if self.gross_salary >= kit.minimum_salary:
+                    self._origin.welcome_kit = self.welcome_kit = kit.id
+                    _welcome_kit_selected = True
+                    break
+            if not _welcome_kit_selected:
+                self._origin.welcome_kit = None
+
     # Basic info
     name = fields.Char(string="Nombre", compute="_on_change_name", required=False)
     name_first = fields.Char(string="Primer Nombre", required=True)
@@ -29,7 +45,7 @@ class BM_Official(models.Model):
         ('male', 'Hombre'),
         ('female', 'Mujer'),
         ('other', 'Otro')
-    ], "Genero", default="male", tracking=True)
+    ], "Sexo", default="male", tracking=True)
     marital = fields.Selection([
         ('single', 'Soltero(a)'),
         ('married', 'Casado(a)'),
@@ -37,7 +53,7 @@ class BM_Official(models.Model):
         ('widower', 'Viudo(a)'),
         ('divorced', 'Divorciado(a)')
     ], string='Estado Civil', default='single', tracking=True)
-    identification_id = fields.Char(string='Cedula de identidad', tracking=True)
+    identification_id = fields.Char(string='Cédula de identidad', tracking=True)
     identification_type = fields.Selection([
         ('1', 'CEDULA DE IDENTIDAD'),
         ('2', 'CREDENCIAL CIVICA'),
@@ -51,24 +67,26 @@ class BM_Official(models.Model):
         ('16', 'CARNET-INMIGRACIONES'),
         ('98', 'No Registra'),
         ('99', 'Inst. Financieras'),
-        ('20', 'REPRES.DIPLOMATICAS')], string="Tipo de identificación", digits=(2), default="1")
-    identification_expiry = fields.Date(string="Vencimiento de identificación")
-    country = fields.Many2one('res.country', 'Nacionalidad (País)', tracking=True)
-    city = fields.Many2one('res.country.state', 'Ciudad', domain="[('country_id', '=?', country)]", required=True)
+        ('20', 'REPRES.DIPLOMATICAS')], string="Tipo de Cédula", digits=(2), default="1")
+    identification_expiry = fields.Date(string="Vencimiento de Cédula", required=True)
+    country = fields.Many2one('res.country', 'Nacionalidad (País)', default=_default_country, required=True, tracking=True)
+    city = fields.Many2one('res.country.state', 'Localidad', domain="[('country_id', '=?', country)]", required=True)
     department = fields.Many2one('res.country.departament', 'Departamento', domain="[('state_id', '=?', city)]", required=True)
     neighborhood = fields.Many2one('res.country.neighborhood', 'Barrio', domain="[('departament_id', '=?', department)]", required=True)
-    real_address = fields.Char(string="Domicilio real", digits=(50), required=True)
-    house_no = fields.Integer(string="Numero de Casa", digits=(3), required=True)
+    real_address = fields.Char(string="Dirección", digits=(50), required=True)
+    house_no = fields.Integer(string="Nro. Casa", digits=(3), required=True)
     street_transversal = fields.Char(string="Calle Transversal", digits=(35))
+    reference = fields.Char(string="Referencia")
     address_code = fields.Integer(default=1, digits=(3))
-    birthday = fields.Date('Fecha de nacimiento', tracking=True)
-    country_of_birth = fields.Many2one('res.country', 'País de Nacimiento', tracking=True)
-    place_of_birth = fields.Many2one('res.country.state', 'Lugar de nacimiento', domain="[('country_id', '=?', country_of_birth)]", tracking=True)
+    birthday = fields.Date('Fecha de nacimiento', tracking=True, required=True)
+    country_of_birth = fields.Many2one('res.country', 'País de Nacimiento', required=True, tracking=True)
+    place_of_birth = fields.Many2one('res.country.state', 'Lugar de nacimiento', domain="[('country_id', '=?', country_of_birth)]", required=True, tracking=True)
 
     # contact
     email = fields.Char('E-mail')
-    work_phone = fields.Char('Work Phone', compute="_compute_phones", store=True, readonly=False)
-    mobile_phone = fields.Char('Work Mobile')
+    work_phone = fields.Char('Teléfono Laboral', compute="_compute_phones", store=True, readonly=False)
+    particular_phone = fields.Char('Teléfono particular')
+    mobile_phone = fields.Char('Teléfono celular', required=True)
     idenfitication_image_front = fields.Binary(
         string="Cédula de Identidad (Frente)", max_width=100, max_height=100)
     idenfitication_image_back = fields.Binary(
@@ -80,11 +98,11 @@ class BM_Official(models.Model):
     # Bank info
     contract_type = fields.Selection([
         ('1', 'Contrato Por Tiempo Indefinido'),
-        ('2', 'Contrato Por Tiempo Definido')], string="Tipo de Contrato", digits=(1), default="2")
+        ('2', 'Contrato Por Tiempo Definido')], string="Tipo de Contrato", required=True, digits=(1), default="2")
     currency_type = fields.Selection([
         ('6900', 'Guaraníes'),
         ('1', 'Dólares Americanos')], string="Tipo de moneda", default="6900")
-    gross_salary = fields.Float(string="Salario", digits=(18, 2))
+    gross_salary = fields.Float(string="Salario Bruto", digits=(18, 2))
     group_type = fields.Selection([
         ('90', 'Payroll'),
         ('94', 'Proveedores')], string="Tipo de Grupo", digits=(3), default="90")
@@ -94,10 +112,16 @@ class BM_Official(models.Model):
     branch_number = fields.Char(string="Sucursal del Funcionario")
     account_number = fields.Char(string="Número de la Cuenta", digits=(9))
     account_name = fields.Char(string="Descripción de la Cuenta", digits=(30))
+    segmentation_aproved = fields.Boolean("Aprobar segmento")
+    segmentation = fields.Selection([
+        ('1', 'SUDAMERIS'),
+        ('2', 'SUDAMERIS PLUS'),
+        ('3', 'SUDAMERIS ELITE')], string="Recomendación Segmentación", default="1")
     sub_segmentation = fields.Selection([
         ('S', 'Crear'),
         ('N', 'No crear')], string="Sub segmentación", digits=(1), default="N")
-    welcome_kit = fields.Many2one('bm.product', 'Welcome Kit')
+    welcome_kit = fields.Many2many('bm.product', 'official_welcome_kit_rel', 'official_id', string='Welcome Kit', store=True)
+
 
     # misc
     notes = fields.Text('Notas')
@@ -105,7 +129,7 @@ class BM_Official(models.Model):
     # pin = fields.Char(string="PIN", copy=False, help="PIN used to Check In/Out in Kiosk Mode (if enabled in Configuration).")
     company_id = fields.Many2one('res.company', required=True, default=lambda self: self.env.company)
     department_id = fields.Many2one('bm.department', 'Departmento', domain="['|', ('company_id', '=', False), ('company_id', '=', company_id)]")
-    job_id = fields.Many2one('bm.job', 'Puesto de trabajo', domain="['|', ('company_id', '=', False), ('company_id', '=', company_id)]")
+    job_id = fields.Many2one('bm.job', 'Cargo', domain="['|', ('company_id', '=', False), ('company_id', '=', company_id)]")
     job_title = fields.Char("Titulo del trabajo", compute="_compute_job_title", store=True, readonly=False)
     parent_id = fields.Many2one('bm.official', 'Gerente', compute="_compute_parent_id", store=True, readonly=False,
         domain="['|', ('company_id', '=', False), ('company_id', '=', company_id)]")
@@ -132,6 +156,8 @@ class BM_Official(models.Model):
     _sql_constraints = [
         ('identification_id_uniq', 'unique(identification_id)', 'Ya existe otro funcionario con la misma cédula de identidad'),
         ('account_number_uniq', 'unique(account_number)', 'Ya existe otro funcionario con el mismo número de cuenta'),
+        ('mobile_phone_uniq', 'unique(mobile_phone)', 'Ya existe otro funcionario con el mismo número de telefono celular'),
+        ('email_uniq', 'unique(email)', 'Ya existe otro funcionario con el mismo E-Mail'),
     ]
 
 
@@ -178,7 +204,20 @@ class BM_Official(models.Model):
     def _compute_departured(self):
         for official in self:
             official.departured = self.env['bm.official.departure'].search(['&', ('identification_id', '=', official.identification_id), ('state', '=', 'active')], order='id desc', limit=1)
-                        
+
+    @api.depends('segmentation', 'gross_salary')
+    def _compute_segmentation(self):
+        for official in self:
+            if not official.segmentation_aproved:
+                # Se computa solo si está en borrador
+                if official.state in ['draft']:
+                    if int(official.gross_salary) < 5000000:
+                        official.segmentation = '1'
+                    elif int(official.gross_salary) >= 5000000 and int(official.gross_salary) < 35000000:
+                        official.segmentation = '2'
+                    elif int(official.gross_salary) >= 35000000:
+                        official.segmentation = '3'
+
     @api.onchange('name_first', 'name_second', 'surname_first', 'surname_second', 'account_number', 'state', 'reliable_base')
     def _on_change_name(self):
         for official in self:
@@ -209,18 +248,6 @@ class BM_Official(models.Model):
             for official in self.env['bm.official'].search([('identification_id', '=', self.identification_id)]):
                 self.identification_id = self._origin.identification_id
                 return self.show_warning('Número de identificación del funcionario', 'El funcionario {} ya posee este Número de Identificación.'.format(official.name))
-
-    @api.onchange('gross_salary')
-    def _on_change_gross_salary(self):
-        if self.state != 'ready':  # Solo si el funcionario no está listo, obtengo los kits y le asigno el kit minimo
-            _welcome_kit_selected = False
-            for kit in self.env['bm.product'].search([('product_type', '=', 'kit')], order='minimum_salary desc'):
-                if self.gross_salary >= kit.minimum_salary:
-                    self._origin.welcome_kit = self.welcome_kit = kit.id
-                    _welcome_kit_selected = True
-                    break
-            if not _welcome_kit_selected:
-                self._origin.welcome_kit = None
 
     @api.onchange('country')
     def _on_change_country(self):
@@ -257,7 +284,7 @@ class BM_Official(models.Model):
                 return self.show_warning('Fecha de ingreso', 'La fecha de ingreso debe ser mayór')
             if self.admission_date > date.today():
                 self.admission_date = None
-                return self.show_warning('Fecha de ingreso', 'La fecha de ingreso no puede ser mayór al dia actual')
+                return self.show_warning('Fecha de ingreso', 'La fecha de ingreso no puede ser mayór al año vigente')
 
     @api.onchange('contract_end_date')
     def _on_change_contract_end_date(self):
@@ -266,10 +293,19 @@ class BM_Official(models.Model):
                 self.contract_end_date = None
                 return self.show_warning('Fecha de fin de contrato', 'La fecha fin de contrato debe ser mayór')
 
+    @api.onchange('segmentation_aproved')
+    def _on_change_segmentation_aproved(self):
+        if not self.segmentation in ['1', '2', '3']:
+            return self.show_warning('Aprobar segmento', 'No se seleccionó ningún segmento')
+
     def button_aprove(self):
+        func_result = {
+            'has_identification_id': [],
+            'message': '',
+            'count_ok': 0
+        }
         # get officials selected
         officials = self.env['bm.official'].browse(self._context.get('active_ids')) or self
-        _ready_count = 0
         # loop officials
         for official in officials:
             # if official has account, validate next one
@@ -279,16 +315,17 @@ class BM_Official(models.Model):
             if official.state in ['check', 'ready']:
                 continue
             # if official has not idenfitication_image or idenfitication_image_pdf, store error and go to next one
-            #if not (official.idenfitication_image_front or official.idenfitication_image_back or official.idenfitication_image_pdf):
-            #    _errors.append(
-            #        '{}: Falta cargar la imagen de la cedula de identidad'.format(official.name))
-            #    continue
+            if not (official.idenfitication_image_front or official.idenfitication_image_back or official.idenfitication_image_pdf):
+                func_result['has_identification_id'].append('{}'.format(official.name))
+                continue
             # if its ok, change state
             if official.state == 'draft':
                 official.state = 'check'
-                _ready_count += 1
-        if _ready_count > 1:
-            return self.show_message('Aprobar', 'Se aprobaron {} funcionarios'.format(_ready_count))
+                count_ok += 1
+        # if _ready_count > 1:
+        if len(func_result['has_identification_id']) > 0:
+            func_result['message'] = '\nLos siguientes funcionarios ya poseen registros validos:\n{}'.format('\n'.join(func_result['has_identification_id']))
+        return self.show_message('Aprobar', 'Se aprobaron {} funcionarios.\n{}'.format(func_result['count_ok'], func_result['message']))
 
 
     def button_draft(self):
@@ -299,17 +336,21 @@ class BM_Official(models.Model):
 
     def button_reset(self):
         for official in self:
-            if official.state == 'ready':
-                official.numero_cuenta = None
-                official.numero_sucursal = None
-                official.nombre_cuenta = None
+            if official.state in ['check', 'error', 'ready']:
+                official.account_number = None
+                official.account_name = None
+                official.branch_number = None
                 official.reliable_base = False
-                official.state = 'check'
+                official.state = 'draft'
+
+    def button_reject(self):
+        for official in self:
+            official.state = 'error'
 
     def create_officials_salary(self):                
         func_result = {
             'has_payment': [],
-            'payment': '',
+            'message': '',
             'count_ok': 0
         }
         officials_salary = self.env['bm.official.salary']
@@ -342,5 +383,5 @@ class BM_Official(models.Model):
                 func_result['count_ok'] += 1
         #if _ready_count > 0:
         if len(func_result['has_payment']) > 0:
-            func_result['payment'] = '\nLos siguientes funcionarios ya poseen registros validos:\n{}'.format('\n'.join(func_result['has_payment']))
-        return self.show_message('Movimiento de salarios', 'Se crearon {} movimientos.\n{}'.format(func_result['count_ok'], func_result['payment']))
+            func_result['message'] = '\nLos siguientes funcionarios ya poseen registros validos:\n{}'.format('\n'.join(func_result['has_payment']))
+        return self.show_message('Movimiento de salarios', 'Se crearon {} movimientos.\n{}'.format(func_result['count_ok'], func_result['message']))

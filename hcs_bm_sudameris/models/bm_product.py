@@ -11,5 +11,10 @@ class BM_Products(models.Model):
       ('producto', 'Producto'),
       ('kit', 'Welcome Kit')], string="Tipo de producto", default='producto', store=True, required=True)
   parent_id = fields.Many2one('bm.product', index=True, ondelete='cascade')
-  child_ids = fields.One2many('bm.product', 'parent_id', string='Productos del kit')
+  child_ids = fields.Many2many(comodel_name='bm.product',
+                              relation='bm_product_rel',
+                              column1='parent_id',
+                              column2='id',
+                              string='Productos del kit',
+                              domain="[('product_type', '=', 'producto')]")
   minimum_salary = fields.Integer(string="Salario minimo", default='0')

@@ -11,7 +11,7 @@ class BM_OfficialApi(models.Model):
 
     def valid_client_reliable_base(self, *args):
         # Checkeo que el usuario actual tiene el permiso del banco
-        if not self.env.user.has_group('hcs_bm_sudameris.group_bm_bank') and not args:
+        if not self.env.user.has_group('hcs_bm_sudameris.group_bm_bank_payroll') and not args:
             return self.show_message('Validar', 'Usted no tiene permiso para ejecutar esta accion')
 
         # Get officials in check and not reliable_base or ready, error and not reliable_base
@@ -58,7 +58,7 @@ class BM_OfficialApi(models.Model):
 
     def client_owns_account(self, *args):
         # Checkeo que el usuario actual tiene el permiso del banco
-        if not self.env.user.has_group('hcs_bm_sudameris.group_bm_bank') and not args:
+        if not self.env.user.has_group('hcs_bm_sudameris.group_bm_bank_payroll') and not args:
             return self.show_message('Validar', 'Usted no tiene permiso para ejecutar esta accion')
 
         # Get officials in check and not reliable_base or ready, error and not reliable_base
