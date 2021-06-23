@@ -1,6 +1,6 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_bm_res_country_departament,access.res.country.departament,model_res_country_departament,hcs_bm_sudameris.group_bm_bank,1,1,1,1
-access_bm_res_country_neighborhood,access.res.country.neighborhood,model_res_country_neighborhood,hcs_bm_sudameris.group_bm_bank,1,1,1,1
+access_bm_res_country_departament,access.res.country.departament,model_res_country_departament,,1,1,1,1
+access_bm_res_country_neighborhood,access.res.country.neighborhood,model_res_country_neighborhood,,1,1,1,1
 access_bm_official,access.bm.official,model_bm_official,,1,1,1,1
 access_bm_product,access.bm.product,model_bm_product,hcs_bm_sudameris.group_bm_bank,1,1,1,1
 access_bm_department,access.bm.department,model_bm_department,hcs_bm_sudameris.group_bm_bank,1,1,1,1

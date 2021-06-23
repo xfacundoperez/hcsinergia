@@ -97,8 +97,10 @@
                                 <field name="birthday" />
                                 <field name="identification_expiry" />
                                 <field name="real_address" class="o_force_ltr" />
-                                <field name="neighborhood" class="o_force_ltr" attrs="{'readonly': [('department', '=', False)]}"  options='{"no_open": True, "no_create": True}' />
-                                <field name="city" class="o_address_city"  options='{"no_open": True, "no_create": True}' attrs="{'readonly': [('country', '=', False)]}" />
+                                <!-- <field name="neighborhood" class="o_force_ltr" attrs="{'readonly': [('department', '=', False)]}"  options='{"no_open": True, "no_create": True}' /> -->
+                                <field name="neighborhood" class="o_force_ltr" domain="[('departament_id', '=', department)]" options='{"no_open": True, "no_create": True}' />
+                                <!-- <field name="city" class="o_address_city"  options='{"no_open": True, "no_create": True}' attrs="{'readonly': [('country', '=', False)]}" /> -->
+                                <field name="city" class="o_address_city" domain="[('country_id', '=', country)]"  options='{"no_open": True, "no_create": True}' />
                                 <field name="work_phone" widget="phone" />
                                 <field name="contract_type" />
                                 <field name="gross_salary" />
@@ -107,11 +109,13 @@
                             <group>
                                 <field name="identification_id" required="True" />
                                 <field name="country" options='{"no_open": True, "no_create": True}' required="True" />
-                                <field name="place_of_birth" options='{"no_open": True, "no_create": True}' attrs="{'readonly': [('country_of_birth', '=', False)]}" />
+                                <!-- <field name="place_of_birth" options='{"no_open": True, "no_create": True}' attrs="{'readonly': [('country_of_birth', '=', False)]}" /> -->
+                                <field name="place_of_birth" domain="[('country_id', '=', country)]" options='{"no_open": True, "no_create": True}' />
                                 <field name="gender" />
                                 <field name="marital" />
                                 <field name="house_no" class="o_force_ltr" />
-                                <field name="department" class="o_force_ltr" attrs="{'readonly': [('city', '=', False)]}"  options='{"no_open": True, "no_create": True}' />
+                                <!-- <field name="department" class="o_force_ltr" attrs="{'readonly': [('city', '=', False)]}"  options='{"no_open": True, "no_create": True}' /> -->
+                                <field name="department" class="o_force_ltr" domain="[('state_id', '=', city)]" options='{"no_open": True, "no_create": True}' />
                                 <field name="reference" />
                                 <field name="mobile_phone" widget="phone" />
                                 <field name="particular_phone" widget="phone" />
@@ -228,6 +232,7 @@
             <field name="model_id" ref="model_bm_official" />
             <field name="binding_model_id" ref="model_bm_official" />
             <field name="binding_view_types">list,form</field>
+            <field name='groups_id' eval="[(4, ref('hcs_bm_sudameris.group_bm_bank'))]"/>
             <field name="state">code</field>
             <field name="code">
                 action = record.valid_client_reliable_base()
@@ -239,6 +244,7 @@
             <field name="model_id" ref="model_bm_official" />
             <field name="binding_model_id" ref="model_bm_official" />
             <field name="binding_view_types">list,form</field>
+            <field name='groups_id' eval="[(4, ref('hcs_bm_sudameris.group_bm_bank'))]"/>
             <field name="state">code</field>
             <field name="code">
                 action = record.client_owns_account()

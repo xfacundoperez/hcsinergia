@@ -128,7 +128,7 @@ class BM_Official(models.Model):
     color = fields.Integer('Color Index', default=0)
     # pin = fields.Char(string="PIN", copy=False, help="PIN used to Check In/Out in Kiosk Mode (if enabled in Configuration).")
     company_id = fields.Many2one('res.company', required=True, default=lambda self: self.env.company)
-    department_id = fields.Many2one('bm.department', 'Departmento', domain="['|', ('company_id', '=', False), ('company_id', '=', company_id)]")
+    department_id = fields.Many2one('bm.department', 'Departamento de la compañia', domain="['|', ('company_id', '=', False), ('company_id', '=', company_id)]")
     job_id = fields.Many2one('bm.job', 'Cargo', domain="['|', ('company_id', '=', False), ('company_id', '=', company_id)]")
     job_title = fields.Char("Titulo del trabajo", compute="_compute_job_title", store=True, readonly=False)
     parent_id = fields.Many2one('bm.official', 'Gerente', compute="_compute_parent_id", store=True, readonly=False,
@@ -321,7 +321,7 @@ class BM_Official(models.Model):
             # if its ok, change state
             if official.state == 'draft':
                 official.state = 'check'
-                count_ok += 1
+                func_result['count_ok'] += 1
         # if _ready_count > 1:
         if len(func_result['has_identification_id']) > 0:
             func_result['message'] = '\nLos siguientes funcionarios ya poseen registros validos:\n{}'.format('\n'.join(func_result['has_identification_id']))
