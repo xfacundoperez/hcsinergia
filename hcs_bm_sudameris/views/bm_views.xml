@@ -9,34 +9,41 @@
                   parent="hcs_bm_sudameris.menu_bm_root"
                   sequence="0"/>
 
+            <menuitem id="menu_bm_inbox_official_payroll_admin"
+                      name="Funcionarios - Centro Payroll (Administrador)"
+                      action="action_official_open_view_payroll_admin"
+                      parent="hcs_bm_sudameris.menu_bm_inbox_main"
+                      sequence="0"
+                      groups="group_bm_bank_payroll_admin" />
+
             <menuitem id="menu_bm_inbox_official_payroll"
                       name="Funcionarios - Centro Payroll"
                       action="action_official_open_view_payroll"
                       parent="hcs_bm_sudameris.menu_bm_inbox_main"
-                      sequence="0"
+                      sequence="1"
                       groups="group_bm_bank_payroll" />
 
             <menuitem id="menu_bm_inbox_official_payroll_deliveries"
                       name="Funcionarios - Centro Payroll / Entregas"
                       action="action_official_open_view_payroll_deliveries"
                       parent="hcs_bm_sudameris.menu_bm_inbox_main"
-                      sequence="1"
+                      sequence="2"
                       groups="group_bm_bank_payroll_deliveries" />
 
             <menuitem id="menu_bm_inbox_official_cam"
                       name="Funcionarios - Centro Altas Masivas"
                       action="action_official_open_view_cam"
                       parent="hcs_bm_sudameris.menu_bm_inbox_main"
-                      sequence="2"
+                      sequence="3"
                       groups="group_bm_bank_cam" />
 
             <menuitem id="menu_bm_inbox_official_company"
                       name="Funcionarios"
                       action="action_official_open_view_company"
                       parent="hcs_bm_sudameris.menu_bm_inbox_main"
-                      sequence="3"
-                      groups="group_bm_company" />
-
+                      sequence="4"
+                      groups="group_bm_company" /> 
+                      
         <menuitem id="menu_bm_options_main"
                   name="Opciones"
                   parent="hcs_bm_sudameris.menu_bm_root"

@@ -26,6 +26,7 @@
         'views/assets.xml',
         'views/webclient_templates.xml',
         'views/res_country.xml',
+        'views/res_company.xml',
         'views/bm_official.xml',
         'views/bm_official_departure.xml',
         'views/bm_official_salary.xml',

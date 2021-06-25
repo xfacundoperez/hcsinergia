@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data>
+        <!-- Bandeja Empresa -->
         <record id="official_tree_view" model="ir.ui.view">
             <field name="name">bm.official.tree.view.company</field>
             <field name="model">bm.official</field>
@@ -10,32 +11,79 @@
                     <field name="account_number" />
                     <field name="name" />
                     <field name="gross_salary" widget='monetary' />
+                    <field name="job_id" />
+                    <field name="notes" string="Respuesta del Banco" />
                     <field name="state" />
                 </tree>
             </field>
         </record>
 
+        <!-- Bandeja Centro Payroll -->
         <record id="official_tree_view_payroll" model="ir.ui.view">
             <field name="name">bm.official.tree.view.bank.payroll</field>
             <field name="model">bm.official</field>
             <field name="arch" type="xml">
-                <tree default_order='state' decoration-info="state=='check'" decoration-warning="state=='draft'" decoration-success="state=='ready'" decoration-danger="state=='error'">
+                <tree default_order='state' create="false" decoration-info="state=='check'" decoration-warning="state=='draft'" decoration-success="state=='ready'" decoration-danger="state=='error'">
+                    <field name="company_code" />
+                    <field name="company_id" />
                     <field name="identification_id" />
                     <field name="name" />
-                    <field name="segmentation" />
                     <field name="gross_salary" widget='monetary' />
-                    <field name="welcome_kit" groups="hcs_bm_sudameris.group_bm_bank" />
-                    <field name="reliable_base" string="Ya es cliente?" />
+                    <field name="segmentation" />
+                    <field name="segmentation_aproved" string="Aprobación Segmento" />
                     <field name="state" />
                 </tree>
             </field>
         </record>
 
+        <!-- Bandeja Centro Payroll -->
+        <record id="official_tree_view_payroll_admin" model="ir.ui.view">
+            <field name="name">bm.official.tree.view.bank.payroll.admin</field>
+            <field name="model">bm.official</field>
+            <field name="arch" type="xml">
+                <tree default_order='state' create="false" decoration-info="state=='check'" decoration-warning="state=='draft'" decoration-success="state=='ready'" decoration-danger="state=='error'">
+                    <field name="company_code" />
+                    <field name="company_id" />
+                    <field name="identification_id" />
+                    <field name="name" />
+                    <field name="gross_salary" widget='monetary' />
+                    <field name="segmentation" />
+                    <field name="segmentation_aproved" string="Aprobación Segmento" />
+                    <field name="state" />
+                </tree>
+            </field>
+        </record>
+
+        <!-- Bandeja Centro Payroll Entregas -->
+        <record id="official_tree_view_payroll_deliveries" model="ir.ui.view">
+            <field name="name">bm.official.tree.view.bank.payroll.deliveries</field>
+            <field name="model">bm.official</field>
+            <field name="arch" type="xml">
+                <tree default_order='state' create="false" decoration-info="state=='check'" decoration-warning="state=='draft'" decoration-success="state=='ready'" decoration-danger="state=='error'">
+                    <field name="company_code" />
+                    <field name="company_id" />
+                    <field name="identification_id" />
+                    <field name="name" />
+                    <field name="job_id" />
+                    <field name="gross_salary" widget='monetary' />
+                    <field name="segmentation" />
+                    <field name="segmentation_aproved" string="Aprobación Segmento" />
+                    <field name="reliable_base" string="Ya es cliente?" />
+                    <field name="notes" string="Observación" />
+                    <field name="reference" string="WK Entregado" />
+                    <field name="state" />
+                </tree>
+            </field>
+        </record>
+
+        <!-- Bandeja Centro Altas Masivas -->
         <record id="official_tree_view_cam" model="ir.ui.view">
             <field name="name">bm.official.tree.view.bank.cam</field>
             <field name="model">bm.official</field>
             <field name="arch" type="xml">
-                <tree default_order='state' decoration-info="state=='check'" decoration-warning="state=='draft'" decoration-success="state=='ready'" decoration-danger="state=='error'">
+                <tree default_order='state' create="false" decoration-info="state=='check'" decoration-warning="state=='draft'" decoration-success="state=='ready'" decoration-danger="state=='error'">
+                    <field name="company_code" />
+                    <field name="company_id" />
                     <field name="identification_id" />
                     <field name="name" />
                     <field name="job_id" />
@@ -49,20 +97,20 @@
             </field>
         </record>
 
+        <!-- Formulario -->
         <record id="official_form_view" model="ir.ui.view">
             <field name="name">bm.official.form.view</field>
             <field name="model">bm.official</field>
             <field name="arch" type="xml">
                 <form string="Funcionarios" class="o_employee_form">
                     <field name="active" invisible="1"/>
-                    <field name="company_id" invisible="1" />
                     <header attrs="{'invisible': [('id', '=', False)]}">
-                        <button name="button_aprove" string="Aprobar" confirm="¿Estás seguro que deseas aprobar este funcionario? Deberá completar los campos de imagen de la Cedula de Identidad." states="draft" class="oe_highlight oe_read_only" type="object" groups="hcs_bm_sudameris.group_bm_bank_payroll" />
-                        <button name="button_reject" string="Rechazar" confirm="¿Estás seguro que rechazar este registro?" states="draft" class="oe_highlight oe_read_only" type="object" groups="hcs_bm_sudameris.group_bm_bank_cam" />
+                        <button name="button_aprove" string="Aprobar" confirm="¿Estás seguro que deseas aprobar este funcionario?" states="draft" class="oe_highlight oe_read_only" type="object" groups="hcs_bm_sudameris.group_bm_bank_payroll" />
+                        <button name="button_refer" string="Remitir al Banco" confirm="¿Estás seguro que deseas remitir al banco a este funcionario? Se iniciará el alta de cuenta" states="draft" class="oe_highlight oe_read_only" type="object" groups="hcs_bm_sudameris.group_bm_company" />
+                        <button name="button_reject" string="Rechazar" confirm="¿Estás seguro que deseas rechazar este registro?" states="check" class="oe_highlight oe_read_only" type="object" groups="hcs_bm_sudameris.group_bm_bank_cam" />
                         <button name="button_reset" string="Reiniciar" confirm="Esta opción es temporal, permite volver a borrador el registro (También borra los registros de Número de cuenta, Nombre de la cuenta" states="check,error,ready" class="oe_highlight oe_read_only" type="object" />
-                        <!--
-                            <button name="button_draft" string="Revertir" confirm="¿Estás seguro que deseas volver este registro a borrador?" states="check" class="oe_highlight oe_read_only" type="object" groups="hcs_bm_sudameris.group_bm_bank_payroll" />
-                        -->
+                        <button name="button_refer_cam" string="Remitir a CAM" confirm="¿Estás seguro que deseas remitir al CAM este funcionario?" states="check" class="oe_read_only" type="object" groups="hcs_bm_sudameris.group_bm_bank_payroll" />
+                        <button name="button_unlink" string="Desvincular" confirm="¿Estás seguro que deseas desvincular a este funcionario?" states="ready"  class="oe_read_only" type="object" />
                         <field name="state" widget="statusbar" statusbar_visible="draft,check,error,ready" />
                     </header>
                     <sheet>
@@ -126,6 +174,32 @@
                             </group>
                         </group>
                         <notebook>
+                            <page string="Información bancaria" groups="hcs_bm_sudameris.group_bm_bank">
+                                <group>
+                                    <group>
+                                        <field name="branch_number" readonly="1" />
+                                        <field name="account_number" readonly="1" />
+                                        <field name="account_name" readonly="1" />
+                                        <field name="account_status" readonly="1" />
+                                        <field name="executive" readonly="1" />
+                                        <field name="group_type" readonly="1" />
+                                        <field name="currency_type" />
+                                    </group>
+                                    <group>
+                                        <!--
+                                            attrs="{'readonly': ['|', ('segmentation', '=', False), ('state', 'not in', ['draft'])]}"
+                                            attrs="{'readonly': ['|', ('segmentation_aproved', '=', True), ('state', 'not in', ['draft'])]}"
+                                            
+                                        -->
+                                        <field name="segmentation_aproved" attrs="{'readonly': [('state', 'in', ['draft'])]}" groups="hcs_bm_sudameris.group_bm_bank_payroll_admin" />
+                                        <field name="segmentation_check" readonly="0" groups="hcs_bm_sudameris.group_bm_bank_payroll" />
+                                        <field name="segmentation" attrs="{'readonly': [('state', 'in', ['draft'])]}" groups="hcs_bm_sudameris.group_bm_bank" />
+                                        <field name="welcome_kit" widget="many2many_tags" attrs="{'readonly': [('state', 'in', ['draft'])]}" options="{'no_open': True, 'no_create': True}" groups="hcs_bm_sudameris.group_bm_bank" />
+                                        <field name="reliable_base" />
+                                        <field name="sub_segmentation" />
+                                    </group>
+                                </group>
+                            </page>
                             <page string="Más información">
                                 <group>
                                     <group>
@@ -133,31 +207,13 @@
                                         <field name="street_transversal" />
                                     </group>
                                     <group>
-                                        <field name="km_home_work" />
+                                        <field name="company_id" options='{"no_open": True, "no_create": True}' />
+                                        <!--<field name="km_home_work" />-->
                                         <field name="departured" options="{'no_open': True, 'no_create': True}" />
                                     </group>
                                 </group>
                                 <label for="notes" />
                                 <field name="notes" />
-                            </page>
-                            <page string="Información bancaria" groups="hcs_bm_sudameris.group_bm_bank">
-                                <group>
-                                    <group>
-                                        <field name="branch_number" readonly="1" />
-                                        <field name="account_number" readonly="1" />
-                                        <field name="account_name" readonly="1" />
-                                        <field name="executive" readonly="1" />
-                                        <field name="group_type" readonly="1" />
-                                    </group>
-                                    <group>
-                                        <field name="sub_segmentation" />
-                                        <field name="currency_type" />
-                                        <field name="segmentation_aproved"  attrs="{'readonly': ['|', ('segmentation', '=', []), ('state', 'not in', ['draft'])]}" groups="hcs_bm_sudameris.group_bm_bank_payroll" />
-                                        <field name="segmentation" attrs="{'readonly': ['|', ('segmentation_aproved', '=', True), ('state', 'not in', ['draft'])]}" groups="hcs_bm_sudameris.group_bm_bank"  />
-                                        <field name="welcome_kit" attrs="{'readonly': ['|', ('segmentation_aproved', '=', True), ('state', 'not in', ['draft'])]}" widget="many2many_tags"  options="{'no_open': True, 'no_create': True}" groups="hcs_bm_sudameris.group_bm_bank" />
-                                        <field name="reliable_base" />
-                                    </group>
-                                </group>
                             </page>
                             <page string="Cedula de identidad (PDF)">
                                 <field name="idenfitication_image_pdf" widget="pdf_viewer" />
@@ -165,29 +221,34 @@
                             </page>
                         </notebook>
                     </sheet>
-                    <!-- <div class="oe_chatter">
-                        <field name="message_follower_ids" widget="mail_followers"/>
-                        <field name="activity_ids" widget="mail_activity"/>
+                    <div class="oe_chatter">
+                        <!--<field name="message_follower_ids" widget="mail_followers"/>-->
+                        <!--<field name="activity_ids" widget="mail_activity"/>-->
                         <field name="message_ids" widget="mail_thread" options="{'thread_level': 1}"/>
-                    </div> -->
+                    </div>
                 </form>
             </field>
         </record>
 
+        <!-- Filtros -->
         <record id="official_search_view" model="ir.ui.view">
             <field name="name">bm.official.search.view</field>
             <field name="model">bm.official</field>
             <field name="arch" type="xml">
                 <search string="Filtrar movimientos">
                     <field name="name" string="Funcionarios" filter_domain="['|', '|', ('name_first', 'ilike', self), ('name_second', 'ilike', self), '|', ('surname_first', 'ilike', self), ('surname_second', 'ilike', self)]" />
+                    <field name="company_code" string="Código Empresa" filter_domain="[('company_code', 'ilike', self)]" />
                     <field name="identification_id" />
                     <field name="account_name" />
                     <field name="account_number" />
+                    <field name="account_status" />
                     <separator />
                     <filter name="state" string="Borrador" domain="[('state', '=', 'draft')]" />
                     <filter name="state" string="En proceso de alta" domain="[('state', '=', 'check')]" />
                     <filter name="state" string="Listo" domain="[('state', '=', 'ready')]" />
                     <filter name="state" string="Revisar" domain="[('state', '=', 'error')]" />
+                    <separator />
+                    <filter name="segmentation_aproved" string="Segmentación aprobada" domain="[('segmentation_aproved', '=', True)]" />
                     <separator />
                     <filter name="reliable_base" string="Sin Validar" domain="[('reliable_base', '=', False)]" />
                     <filter name="reliable_base" string="Validado" domain="[('reliable_base', '=', True)]" />
@@ -216,14 +277,16 @@
             </field>
         </record>
 
-        <record id="action_official_aprove" model="ir.actions.server">
-            <field name="name">Aprobar</field>
+        <!-- Botónes -->
+        <record id="action_official_refer" model="ir.actions.server">
+            <field name="name">Remitir al banco</field>
             <field name="model_id" ref="model_bm_official" />
             <field name="binding_model_id" ref="model_bm_official" />
             <field name="binding_view_types">list,form</field>
+            <field name='groups_id' eval="[(4, ref('hcs_bm_sudameris.group_bm_company'))]"/>
             <field name="state">code</field>
             <field name="code">
-                action = record.button_aprove()
+                action = record.button_refer()
             </field>
         </record>
 
@@ -251,17 +314,31 @@
             </field>
         </record>
 
-        <record id="action_official_create_officials_salary" model="ir.actions.server">
-            <field name="name">Crear movimientos de salarios</field>
+        <record id="action_official_button_unlink" model="ir.actions.server">
+            <field name="name">Desvincular</field>
             <field name="model_id" ref="model_bm_official" />
             <field name="binding_model_id" ref="model_bm_official" />
             <field name="binding_view_types">list</field>
             <field name="state">code</field>
             <field name="code">
-                action = record.create_officials_salary()
+                action = record.button_unlink()
             </field>
         </record>
 
+        <record id="action_official_create_officials_salary" model="ir.actions.server">
+            <field name="name">Crear movimientos de salarios</field>
+            <field name="model_id" ref="model_bm_official" />
+            <field name="binding_model_id" ref="model_bm_official" />
+            <field name="binding_view_types">list</field>
+            <field name='groups_id' eval="[(4, ref('hcs_bm_sudameris.group_bm_company'))]"/>
+            <field name="state">code</field>
+            <field name="code">
+                action = record.create_officials_salary()
+            </field>
+        </record>
+        <!-- Fin Botones -->
+
+        <!-- Acción - Bandeja Centro Payroll -->
         <record id="action_official_open_view_payroll" model="ir.actions.act_window">
             <field name="name">Bandeja de Funcionarios - Centro Payroll</field>
             <field name="type">ir.actions.act_window</field>
@@ -269,30 +346,47 @@
             <field name="view_mode">tree,form</field>
             <field name="view_id" ref="official_tree_view_payroll"/>
             <field name="context">{}</field>
-            <field name="domain">[]</field>
+            <field name="domain">['&amp;', ('state', 'not in', ['draft']), ('cam_check', '=', False)]</field>
             <field name="help" type="html">
                 <div class="oe_view_nocontent_create">
-                    <p>SELECIONE SU ARCHIVO PARA REALIZAR LA CARGA</p>
-                    <p>El archivo seleccionado debe ser en formato Excel o CSV</p>
+                    <p>Lista de funcionaros</p>
                 </div>
             </field>
         </record>
 
+        <!-- Acción - Bandeja Centro Payroll (Administrador) -->
+        <record id="action_official_open_view_payroll_admin" model="ir.actions.act_window">
+            <field name="name">Bandeja de Funcionarios - Centro Payroll (Administrador)</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">bm.official</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="official_tree_view_payroll_admin"/>
+            <field name="context">{}</field>
+            <field name="domain">['&amp;', ('segmentation_check', '=', True), ('segmentation_aproved', '=', False)]</field>
+            <field name="help" type="html">
+                <div class="oe_view_nocontent_create">
+                    <p>Lista de funcionaros</p>
+                </div>
+            </field>
+        </record>
+
+        <!-- Acción - Bandeja Centro Payroll Entregas -->
         <record id="action_official_open_view_payroll_deliveries" model="ir.actions.act_window">
             <field name="name">Bandeja de Funcionarios - Centro Payroll / Entregas</field>
             <field name="type">ir.actions.act_window</field>
             <field name="res_model">bm.official</field>
             <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="official_tree_view_payroll_deliveries"/>
             <field name="context">{}</field>
-            <field name="domain">[]</field>
+            <field name="domain">[["segmentation_aproved", "=", True]]</field>
             <field name="help" type="html">
                 <div class="oe_view_nocontent_create">
-                    <p>SELECIONE SU ARCHIVO PARA REALIZAR LA CARGA</p>
-                    <p>El archivo seleccionado debe ser en formato Excel o CSV</p>
+                    <p>Lista de funcionaros</p>
                 </div>
             </field>
         </record>
 
+        <!-- Acción - Bandeja Centro Altas Masivas -->
         <record id="action_official_open_view_cam" model="ir.actions.act_window">
             <field name="name">Bandeja de Funcionarios - Centro Altas Masivas</field>
             <field name="type">ir.actions.act_window</field>
@@ -300,15 +394,15 @@
             <field name="view_mode">tree,form</field>
             <field name="view_id" ref="official_tree_view_cam"/>
             <field name="context">{}</field>
-            <field name="domain">[]</field>
+            <field name="domain">['&amp;', ('state', 'not in', ['draft']), ('cam_check', '=', True)]</field>
             <field name="help" type="html">
                 <div class="oe_view_nocontent_create">
-                    <p>SELECIONE SU ARCHIVO PARA REALIZAR LA CARGA</p>
-                    <p>El archivo seleccionado debe ser en formato Excel o CSV</p>
+                    <p>Lista de funcionaros</p>
                 </div>
             </field>
         </record>
 
+        <!-- Acción - Bandeja Empresa -->
         <record id="action_official_open_view_company" model="ir.actions.act_window">
             <field name="name">Bandeja de Funcionarios</field>
             <field name="type">ir.actions.act_window</field>
