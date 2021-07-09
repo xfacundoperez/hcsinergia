@@ -13,7 +13,8 @@ class BM_OfficialSalary(models.Model):
 
   @api.depends('amount_to_pay', 'official_gross_salary')
   def _compute_amount_to_pay(self):
-    self.amount_to_pay = self.official_gross_salary
+    for rec in self:
+      rec.amount_to_pay = rec.official_gross_salary
 
   official = fields.Many2one('bm.official', 'Funcionario')
   official_identification_id = fields.Char(string='Nº identificación', related='official.identification_id', readonly=True)
@@ -76,7 +77,7 @@ class BM_OfficialSalary(models.Model):
     # Los registros que están aprobados, los seteo en proceso
     for rec in self:
       if rec.state == 'aproved':
-        rec.state == 'check'
+        rec.state = 'check'
     # Obtengo solo los ID de los que están en proceso y si hay alguno, genero el archivo de pago
     _ids = self.search([('state', 'in', ['check'])]).ids
     if _ids:
@@ -86,7 +87,7 @@ class BM_OfficialSalary(models.Model):
         'target': 'self'
       }
     else:
-      return self.show_message('Generar Pago', 'No se generó ningun pago')
+      return self.show_message('Generar Pago', 'No se generó ningun pago, los registros no están aprovados')
 
 
 class BM_OfficialSalaryHistory(models.Model):

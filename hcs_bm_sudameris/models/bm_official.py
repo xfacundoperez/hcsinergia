@@ -429,9 +429,8 @@ class BM_Official(models.Model):
             'message': '',
             'count_ok': 0
         }
-        officials_salary = self.env['bm.official.salary']
-        # Obtengo los funcionarios seleccionados
-        for official in self.env['bm.official'].search([
+        officials_salary = self.env['bm.official.salary'].sudo()
+        officials = self.env['bm.official'].search([
                 '&',
                 '&', 
                 ('id', 'in', self._context.get('active_ids')), 
@@ -442,7 +441,9 @@ class BM_Official(models.Model):
                 '&', 
                 ('gross_salary', '>', 0),
                 ('reliable_base', '=', True)
-            ]):
+            ])
+        # Obtengo los funcionarios seleccionados
+        for official in officials:
             _create_official_salary = True
             # Get the last movement and check if in 35 range and is paid
             for official_salary in officials_salary.search([('official.id', '=', official.id)], order='id desc', limit=1):
@@ -456,7 +457,6 @@ class BM_Official(models.Model):
                     'official': official.id,
                 })
                 func_result['count_ok'] += 1
-        #if _ready_count > 0:
         if len(func_result['has_payment']) > 0:
             func_result['message'] = '\nLos siguientes funcionarios ya poseen registros validos:\n{}'.format('\n'.join(func_result['has_payment']))
         return self.show_message('Movimiento de salarios', 'Se crearon {} movimientos.\n{}'.format(func_result['count_ok'], func_result['message']))

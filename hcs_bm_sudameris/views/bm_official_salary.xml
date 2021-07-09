@@ -39,7 +39,7 @@
                         <group string="Información de liquidación">
                             <group>
                                 <field name="charge_type" />
-                                <field name="amount_to_pay" />
+                                <field name="amount_to_pay" readonly="0" />
                                 <field name="payment_date" />
                                 <field name="payment_mode" />
                             </group>
