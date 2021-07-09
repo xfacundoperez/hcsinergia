@@ -23,7 +23,7 @@ class ApiWsClientePoseeCuenta:
         Sucursal:       Sucursal                |   N(2)
         Estado:         Estado de la Cuenta     |   C(1)
         CodRetorno:     Código de Retorno       |   N(3)
-        Observasión:    Nombre de Persona       |   C(100)
+        Observación:    Nombre de Persona       |   C(100)
         """        
         wsurl = self.base_url + "WSClientePoseeCuenta"
         headers = {'Content-Type': 'application/json'} # set what your server accepts
@@ -57,24 +57,21 @@ class ApiWsClientePoseeCuenta:
 
             if len(response['Result']['Consultas']['RepCons.Consulta'][0]['Columnas']['RepCols.Columna'][0]['Filas']['RepFilas.Fila']):
                 account_number = response['Result']['Consultas']['RepCons.Consulta'][0]['Columnas']['RepCols.Columna'][0]['Filas']['RepFilas.Fila'][0]['Valor']
-                account_name = response['Result']['Consultas']['RepCons.Consulta'][0]['Columnas']['RepCols.Columna'][1]['Filas']['RepFilas.Fila'][0]['Valor']
-                branch_number = response['Result']['Consultas']['RepCons.Consulta'][0]['Columnas']['RepCols.Columna'][2]['Filas']['RepFilas.Fila'][0]['Valor']
-                branch_number = 10 #Coloco 10 porque ninguna opción devuelve el numero de cuenta
+                branch_number = response['Result']['Consultas']['RepCons.Consulta'][0]['Columnas']['RepCols.Columna'][1]['Filas']['RepFilas.Fila'][0]['Valor']
+                account_name = response['Result']['Consultas']['RepCons.Consulta'][0]['Columnas']['RepCols.Columna'][2]['Filas']['RepFilas.Fila'][0]['Valor']
             else:
                 account_number = None
                 account_name = None
                 branch_number = None
 
-            result = {
+            return {
                 "account_number": account_number,
                 "account_name": account_name,
                 "branch_number": branch_number
             }
-
-            return result
         except:
             return {
-                "account_number": -None,
+                "account_number": None,
                 "account_name": None,
                 "branch_number": None
             }

@@ -7,7 +7,7 @@
             <field name="arch" type="xml">
                 <tree string="Licencias">
                     <field name="official" />
-                    <field name="identification_id" />
+                    <field name="official_identification_id" />
                     <field name="departure_reason" />
                     <field name="departure_start" />
                     <field name="departure_end" />
@@ -26,14 +26,14 @@
                     </header>
                     <sheet>
                         <group string="Información del funcionario">
-                            <field name="identification_id" />
-                            <field name="official" required="True" />
+                            <field name="official" attrs="{'readonly': [('official', '!=', None)]}" />
+                            <field name="official_identification_id" />
                         </group>
                         <group string="Información de la licencia">
                             <group>
-                                <field name="departure_reason" />
+                                <field name="departure_reason" attrs="{'readonly': [('official', '!=', None)]}" />
                                 <field name="departure_description" />
-                                <field name="departure_start" />
+                                <field name="departure_start" attrs="{'readonly': [('official', '!=', None)]}" />
                                 <field name="departure_end"  attrs="{'readonly': [('departure_reason', 'in', ['fired', 'resigned', 'retired'])], 'required': [('departure_reason', '=', 'medical')]}" />
                             </group>
                         </group>

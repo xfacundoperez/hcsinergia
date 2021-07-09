@@ -6,13 +6,13 @@
             <field name="name">bm.official.tree.view.company</field>
             <field name="model">bm.official</field>
             <field name="arch" type="xml">
-                <tree default_order='state' decoration-info="state=='check'" decoration-warning="state=='draft'" decoration-success="state=='ready'" decoration-danger="state=='error'">
+                <tree default_order='state' decoration-info="state in ['check', 'pending']" decoration-warning="state=='draft'" decoration-success="state=='ready'" decoration-danger="state=='error'">
                     <field name="identification_id" />
                     <field name="account_number" />
                     <field name="name" />
                     <field name="gross_salary" widget='monetary' />
                     <field name="job_id" />
-                    <field name="notes" string="Respuesta del Banco" />
+                    <field name="reject_reason" string="Respuesta del Banco" />
                     <field name="state" />
                 </tree>
             </field>
@@ -23,7 +23,7 @@
             <field name="name">bm.official.tree.view.bank.payroll</field>
             <field name="model">bm.official</field>
             <field name="arch" type="xml">
-                <tree default_order='state' create="false" decoration-info="state=='check'" decoration-warning="state=='draft'" decoration-success="state=='ready'" decoration-danger="state=='error'">
+                <tree default_order='state' create="false" decoration-info="state in ['check', 'pending']" decoration-warning="state=='draft'" decoration-success="state=='ready'" decoration-danger="state=='error'">
                     <field name="company_code" />
                     <field name="company_id" />
                     <field name="identification_id" />
@@ -41,7 +41,7 @@
             <field name="name">bm.official.tree.view.bank.payroll.admin</field>
             <field name="model">bm.official</field>
             <field name="arch" type="xml">
-                <tree default_order='state' create="false" decoration-info="state=='check'" decoration-warning="state=='draft'" decoration-success="state=='ready'" decoration-danger="state=='error'">
+                <tree default_order='state' create="false" decoration-info="state in ['check', 'pending']" decoration-warning="state=='draft'" decoration-success="state=='ready'" decoration-danger="state=='error'">
                     <field name="company_code" />
                     <field name="company_id" />
                     <field name="identification_id" />
@@ -59,7 +59,27 @@
             <field name="name">bm.official.tree.view.bank.payroll.deliveries</field>
             <field name="model">bm.official</field>
             <field name="arch" type="xml">
-                <tree default_order='state' create="false" decoration-info="state=='check'" decoration-warning="state=='draft'" decoration-success="state=='ready'" decoration-danger="state=='error'">
+                <tree default_order='state' create="false" decoration-info="state in ['check', 'pending']" decoration-warning="state=='draft'" decoration-success="state=='ready'" decoration-danger="state=='error'">
+                    <field name="company_code" />
+                    <field name="company_id" />
+                    <field name="identification_id" />
+                    <field name="account_number" />
+                    <field name="name" />
+                    <field name="gross_salary" widget='monetary' />
+                    <field name="job_id" />
+                    <field name="reject_reason" string="Respuesta del Banco" />
+                    <field name="unlinked" />
+                    <field name="state" />
+                </tree>
+            </field>
+        </record>
+
+        <!-- Bandeja Centro Altas Masivas -->
+        <record id="official_tree_view_cam" model="ir.ui.view">
+            <field name="name">bm.official.tree.view.bank.cam</field>
+            <field name="model">bm.official</field>
+            <field name="arch" type="xml">
+                <tree default_order='state' create="false" decoration-info="state in ['check', 'pending']" decoration-warning="state=='draft'" decoration-success="state=='ready'" decoration-danger="state=='error'">
                     <field name="company_code" />
                     <field name="company_id" />
                     <field name="identification_id" />
@@ -69,16 +89,15 @@
                     <field name="segmentation" />
                     <field name="segmentation_aproved" string="Aprobación Segmento" />
                     <field name="reliable_base" string="Ya es cliente?" />
-                    <field name="notes" string="Observación" />
-                    <field name="reference" string="WK Entregado" />
+                    <field name="reject_reason" string="Observación" />
                     <field name="state" />
                 </tree>
             </field>
         </record>
 
         <!-- Bandeja Centro Altas Masivas -->
-        <record id="official_tree_view_cam" model="ir.ui.view">
-            <field name="name">bm.official.tree.view.bank.cam</field>
+        <record id="official_tree_view_collections" model="ir.ui.view">
+            <field name="name">bm.official.tree.view.bank.collections</field>
             <field name="model">bm.official</field>
             <field name="arch" type="xml">
                 <tree default_order='state' create="false" decoration-info="state=='check'" decoration-warning="state=='draft'" decoration-success="state=='ready'" decoration-danger="state=='error'">
@@ -91,7 +110,7 @@
                     <field name="segmentation" />
                     <field name="segmentation_aproved" string="Aprobación Segmento" />
                     <field name="reliable_base" string="Ya es cliente?" />
-                    <field name="notes" string="Observación" />
+                    <field name="reject_reason" string="Observación" />
                     <field name="state" />
                 </tree>
             </field>
@@ -104,19 +123,22 @@
             <field name="arch" type="xml">
                 <form string="Funcionarios" class="o_employee_form">
                     <field name="active" invisible="1"/>
+                    <field name="unlinked" invisible="1"/>
                     <header attrs="{'invisible': [('id', '=', False)]}">
-                        <button name="button_aprove" string="Aprobar" confirm="¿Estás seguro que deseas aprobar este funcionario?" states="draft" class="oe_highlight oe_read_only" type="object" groups="hcs_bm_sudameris.group_bm_bank_payroll" />
-                        <button name="button_refer" string="Remitir al Banco" confirm="¿Estás seguro que deseas remitir al banco a este funcionario? Se iniciará el alta de cuenta" states="draft" class="oe_highlight oe_read_only" type="object" groups="hcs_bm_sudameris.group_bm_company" />
-                        <button name="button_reject" string="Rechazar" confirm="¿Estás seguro que deseas rechazar este registro?" states="check" class="oe_highlight oe_read_only" type="object" groups="hcs_bm_sudameris.group_bm_bank_cam" />
-                        <button name="button_reset" string="Reiniciar" confirm="Esta opción es temporal, permite volver a borrador el registro (También borra los registros de Número de cuenta, Nombre de la cuenta" states="check,error,ready" class="oe_highlight oe_read_only" type="object" />
+                        <button name="button_aprove" string="Aprobar" confirm="¿Estás seguro que deseas aprobar este funcionario?" states="check" class="oe_highlight oe_read_only" type="object" groups="hcs_bm_sudameris.group_bm_bank_cam" />
+                        <button name="%(hcs_bm_sudameris.bm_official_wizard_reject_cam_action)d" string="Rechazar" states="check" class="oe_read_only" type="action" groups="hcs_bm_sudameris.group_bm_bank_cam" />
+                        <button name="button_refer" string="Remitir al Banco" confirm="¿Estás seguro que deseas remitir al banco a este funcionario? Se iniciará el alta de cuenta" states="draft,error" class="oe_highlight oe_read_only" type="object" groups="hcs_bm_sudameris.group_bm_company" />
+                        <button name="button_reset" string="Reiniciar" confirm="Esta opción es temporal, permite volver a borrador el registro (También borra los registros de Número de cuenta, Nombre de la cuenta y Validaciónes via API)" states="check,error,pending,ready" class="oe_read_only" type="object" />
                         <button name="button_refer_cam" string="Remitir a CAM" confirm="¿Estás seguro que deseas remitir al CAM este funcionario?" states="check" class="oe_read_only" type="object" groups="hcs_bm_sudameris.group_bm_bank_payroll" />
                         <button name="button_unlink" string="Desvincular" confirm="¿Estás seguro que deseas desvincular a este funcionario?" states="ready"  class="oe_read_only" type="object" />
+                        <button name="%(hcs_bm_sudameris.bm_official_departure_wizard_action)d" string="Agregar Licencia" class="oe_read_only" states="ready" type="action" groups="hcs_bm_sudameris.group_bm_company" />
                         <field name="state" widget="statusbar" statusbar_visible="draft,check,error,ready" />
                     </header>
                     <sheet>
-                        <widget name="web_ribbon" title="Archived" bg_color="bg-danger" attrs="{'invisible': [('active', '=', True)]}"/>
-                        <!--<widget name="web_ribbon" title="CANCELADO" bg_color="bg-danger" attrs="{'invisible': ['&amp;', ('account_name', '!=', 'CANCELADO'), ('account_name', 'in', ['INACTIVO', 'NORMAL', 'PACON'])]}"/>
-                        <widget name="web_ribbon" title="INACTIVO" bg_color="bg-danger" attrs="{'invisible': ['&amp;', ('account_name', '!=', 'INACTIVO'), ('account_name', 'in', ['CANCELADO', 'NORMAL', 'PACON'])]}"/>-->
+                        <widget name="web_ribbon" title="Licencia" bg_color="bg-danger" attrs="{'invisible': ['&amp;', ('active', '=', True), ('departured', '=', False)]}"/>
+                        <!--<widget name="web_ribbon" title="CANCELADO" bg_color="bg-danger" attrs="{'invisible': ['&amp;', ('account_name', '!=', 'CANCELADO'), ('account_name', 'in', ['INACTIVO', 'NORMAL', 'PACON'])]}"/>-->
+                        <!--<widget name="web_ribbon" title="Archived" bg_color="bg-danger" attrs="{'invisible': [('active', '=', True)]}"/>-->
+                        <widget name="web_ribbon" title="DESVINCULADO" bg_color="bg-danger" attrs="{'invisible': [('unlinked', '=', False)]}"/>
                         <field name="image_1920" widget='image' class="oe_avatar" options='{"zoom": true, "preview_image":"image_128"}'/>
                         <div class="oe_title">
                             <h1 class="oe_read_only">
@@ -195,21 +217,23 @@
                                         <field name="segmentation_check" readonly="0" groups="hcs_bm_sudameris.group_bm_bank_payroll" />
                                         <field name="segmentation" attrs="{'readonly': [('state', 'in', ['draft'])]}" groups="hcs_bm_sudameris.group_bm_bank" />
                                         <field name="welcome_kit" widget="many2many_tags" attrs="{'readonly': [('state', 'in', ['draft'])]}" options="{'no_open': True, 'no_create': True}" groups="hcs_bm_sudameris.group_bm_bank" />
-                                        <field name="reliable_base" />
+                                        <field name="reliable_base" string="Valida Base Confiable" />
                                         <field name="sub_segmentation" />
                                     </group>
                                 </group>
                             </page>
                             <page string="Más información">
+                                <label for="reject_reason" />
+                                <field name="reject_reason" readonly="True" />
                                 <group>
+                                    <group>
+                                        <field name="company_id" options='{"no_open": True, "no_create": True}' readonly="1" />
+                                        <!--<field name="km_home_work" />-->
+                                        <field name="departured" options="{'no_open': True, 'no_create': True}" />
+                                    </group>
                                     <group>
                                         <field name="contract_end_date" />
                                         <field name="street_transversal" />
-                                    </group>
-                                    <group>
-                                        <field name="company_id" options='{"no_open": True, "no_create": True}' />
-                                        <!--<field name="km_home_work" />-->
-                                        <field name="departured" options="{'no_open': True, 'no_create': True}" />
                                     </group>
                                 </group>
                                 <label for="notes" />
@@ -290,19 +314,7 @@
             </field>
         </record>
 
-        <record id="action_official_valid_client_reliable_base" model="ir.actions.server">
-            <field name="name">Validar</field>
-            <field name="model_id" ref="model_bm_official" />
-            <field name="binding_model_id" ref="model_bm_official" />
-            <field name="binding_view_types">list,form</field>
-            <field name='groups_id' eval="[(4, ref('hcs_bm_sudameris.group_bm_bank'))]"/>
-            <field name="state">code</field>
-            <field name="code">
-                action = record.valid_client_reliable_base()
-            </field>
-        </record>
-
-        <record id="action_official_valid_client_owns_account" model="ir.actions.server">
+        <record id="action_official_valid_client" model="ir.actions.server">
             <field name="name">Verificar cuenta</field>
             <field name="model_id" ref="model_bm_official" />
             <field name="binding_model_id" ref="model_bm_official" />
@@ -310,7 +322,7 @@
             <field name='groups_id' eval="[(4, ref('hcs_bm_sudameris.group_bm_bank'))]"/>
             <field name="state">code</field>
             <field name="code">
-                action = record.client_owns_account()
+                action = record.valid_client_reliable_base()
             </field>
         </record>
 
@@ -378,7 +390,7 @@
             <field name="view_mode">tree,form</field>
             <field name="view_id" ref="official_tree_view_payroll_deliveries"/>
             <field name="context">{}</field>
-            <field name="domain">[["segmentation_aproved", "=", True]]</field>
+            <field name="domain">[('account_status', '=', 'NORMAL')]</field>
             <field name="help" type="html">
                 <div class="oe_view_nocontent_create">
                     <p>Lista de funcionaros</p>
@@ -394,7 +406,23 @@
             <field name="view_mode">tree,form</field>
             <field name="view_id" ref="official_tree_view_cam"/>
             <field name="context">{}</field>
-            <field name="domain">['&amp;', ('state', 'not in', ['draft']), ('cam_check', '=', True)]</field>
+            <field name="domain">['&amp;', ('state', 'in', ['check', 'pending']), ('cam_check', '=', True)]</field>
+            <field name="help" type="html">
+                <div class="oe_view_nocontent_create">
+                    <p>Lista de funcionaros</p>
+                </div>
+            </field>
+        </record>
+
+        <!-- Acción - Bandeja Cobranzas -->
+        <record id="action_official_open_view_collections" model="ir.actions.act_window">
+            <field name="name">Bandeja de Funcionarios - Cobranzas</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">bm.official</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="official_tree_view_collections"/>
+            <field name="context">{}</field>
+            <field name="domain">[('unlinked', '=', True)]</field>
             <field name="help" type="html">
                 <div class="oe_view_nocontent_create">
                     <p>Lista de funcionaros</p>

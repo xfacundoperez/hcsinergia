@@ -8,56 +8,71 @@ import tempfile
 
 class BM_OfficialSalary_Controller(http.Controller):
     @http.route('/web/binary_text/create_file_txt', type='http', auth="user")
-    def index(self, req):        
-        # Composición del nombre: ENTIDAD_SERVICIO_FECHA+HORA.TXT
-        # Ejemplo: GESTION_PAGODESALARIOS_20200519103252.TXT
-        # Tipo de dato: I: Entero, C: Caracter o Alfanumérico, D: Fecha, N: Numérico decimal con dos valores decimales
-        ## CABECERA: Identificador de cabecera(C:1);Código de contrato(I:9);E-mail asociado al Servicio(C:50);Moneda(I:4);Importe(N:15.2);Cantidad de Documentos(I:5); \
-        ## Fecha de Pago(D:8);Referencia(C:18);Tipo de Cobro(I:3);Debito Crédito(I:1);Cuenta Débito(I:9);Sucursal Débito(I:3);Módulo Débito(I:3); \ 
-        ## Moneda Débito(I:4)Operación Débito(I:9);Sub Operación Débito(I:3);Tipo Operación Débito(I:3)
-        # Ejemplo CABECERA: H;999;mail@entidad.com;6900;52000.00;1;19/05/20; 202005902952101999;1;1;1982073;10;20;6900;0;0;0
-        ## DETALLE: Identificador del detalle(C:1);Concepto(C:30);Primer Apellido(C:15);Segundo Apellido(C:15);Primer Nombre(C:15);Segundo Nombre(C:15); \ 
-        ## País(I:3);Tipo de Documento(I:2);Número de Documento(C:15);Moneda(I:4);Importe(N:15.2);Fecha de Pago(D:8);Modalidad de Pago(I:3); \ 
-        ## Número de Cuenta(I:9);Sucursal Empleado(I:3);Moneda Empleado(I:4);Operación Empleado(I:9);Tipo de Operación Empleado(I:3);Suboperación Empleado(I:3); \ 
-        ## Referencia(C:18);Tipo de Contrato(I:3);Sueldo Bruto(N:15.2);Fecha Fin de Contrato(D:8);
-        # Ejemplo DETALLE: D;PAGO DE SALARIO VIA BANCO;APELLIDO 1;APELLIDO 2;NOMBRE 1;NOMBRE 2;586;1;111222;6900;52000.00;19/05/20;21;498154;10;6900;0;0;0;202005902952101999;1;528000.00;31/12/99
-        # _txt = 'Token: {}\n'.format(get_token)
-
-
+    def index(self, req):
+        #Si no se pasaron ids, no genera nada
         if not req.params.get('ids'):
             return False
+        _ids = req.params.get('ids')
+        _fecha_pago = datetime.now().strftime("%d/%m/%Y")
+        _referencia = '202005902952101999'
+
         # Get the selected official's salary movement
-        officials_salary = http.request.env['bm.official.salary'].search([('id', 'in', req.params.get('ids').split(','))])
+        officials_salary = http.request.env['bm.official.salary'].search([('id', 'in', _ids.split(','))])
         # Creo el TXT
-        file_title = 'BANKMANAGEMENT_{}.txt'.format(datetime.strftime(datetime.now(), '%Y%m%d%H%M%S'))
-        file_content_header = 'H;999;mail@entidad.com;6900;52000.00;1;19/05/20;202005902952101999;1;1;1982073;10;20;6900;0;0;0\n'
+        # Tipo de dato: I: Entero, C: Caracter o Alfanumérico, D: Fecha, N: Numérico decimal con dos valores decimales
+        # Composición del nombre: ENTIDAD_SERVICIO_FECHA+HORA.TXT
+        file_title = 'Pago_de_Salario_via_Banco_{}.txt'.format(datetime.now().strftime("%Y%m%d%H%M%S"))
         file_content_detail = ''
+        _amount_to_pay_sum = 0
         for official_salary in officials_salary:
-            if official_salary.state == 'aproved':
-                #D;PAGO DE SALARIO VIA BANCO;APELLIDO 1;APELLIDO 2;NOMBRE 1;NOMBRE 2;586;1;111222;6900;52000.00;19/05/20;21;498154;10;6900;0;0;0;202005902952101999;1;528000.00;31/12/99
-                file_content_detail += "D;PAGO DE SALARIO;{};{};{};{};{};{};{};{};{};{};{};{};{};{};{};{};{};{};{};{};{}\n".format(
-                    official_salary.official.surname_first or '',
-                    official_salary.official.surname_second or '',
-                    official_salary.official.name_first or '',
-                    official_salary.official.name_second or '',
-                    official_salary.official.country.name or '',
-                    official_salary.official.identification_type or '',
-                    official_salary.official.identification_id or '',
-                    official_salary.currency_type or '',
-                    official_salary.amount_to_pay or '',
-                    official_salary.payment_date or '',
-                    official_salary.payment_mode or '',
-                    official_salary.official.account_number or '', 
-                    official_salary.official.branch_number or '',
-                    official_salary.official.currency_type or '',
-                    official_salary.operation_code or '', 
-                    official_salary.operation_type or '',
-                    official_salary.suboperacion_code or '',
-                    official_salary.reference or '',
-                    official_salary.official.contract_type or '',
-                    official_salary.official.gross_salary or '',
-                    official_salary.official.contract_end_date or '',
-                )
+            _amount_to_pay_sum += official_salary.amount_to_pay
+            file_content_detail += "{};{};{};{};{};{};{};{};{};{};{};{};{};{};{};{};{};{};{};{};{};{};{}\n".format(
+                'D',                                                # Identificador del detalle(C:1)
+                'Pago_de_Salario_via_Banco',                        # Concepto(C:30)
+                official_salary.official.surname_first,             # Primer Apellido(C:15)
+                official_salary.official.surname_second or '',      # Segundo Apellido(C:15)
+                official_salary.official.name_first,                # Primer Nombre(C:15)
+                official_salary.official.name_second or '',         # Segundo Nombre(C:15)
+                official_salary.official.country.code_number,       # País(I:3)
+                official_salary.official.identification_type,       # Tipo de Documento(I:2)
+                official_salary.official.identification_id,         # Número de Documento(C:15)
+                official_salary.official.currency_type,             # Moneda(I:4)
+                official_salary.amount_to_pay,                      # Importe(N:15.2)
+                official_salary.payment_date or '',                 # Fecha de Pago(D:8)
+                official_salary.payment_mode or '',                 # Modalidad de Pago(I:3)
+                official_salary.official.account_number or '',      # Número de Cuenta(I:9)
+                official_salary.official.branch_number,             # Sucursal Empleado(I:3)
+                official_salary.official.currency_type,             # Moneda Empleado(I:4)
+                '0',                                                # Operación Empleado(I:9): En estos campos va siempre el numero 0
+                '0',                                                # Tipo de Operación Empleado(I:3): En estos campos va siempre el numero 0
+                '0',                                                # Suboperación Empleado(I:3): En estos campos va siempre el numero 0
+                _referencia,                                        # Referencia(C:18): Dicho campo debe ser exactamente igual que el campo REFERENCIA en la CABECERA
+                '1',                                                # Tipo de Contrato(I:3): Este campo se coloca siempre el numero 1
+                official_salary.official.gross_salary or '0.00',    # Sueldo Bruto(N:15.2)
+                official_salary.official.contract_end_date or '//', # Fecha Fin de Contrato(D:8)
+            )
+
+        file_content_header = '{};{};{};{};{};{};{};{};1;1;1982073;10;20;6900;0;0;0\n'.format(
+            'H',                    # Identificador de cabecera(C:1)
+            '999',                  # Código de contrato(I:9)
+            'mail@entidad.com',     # E-mail asociado al Servicio(C:50)
+            '6900',                 # Moneda(I:4)
+            _amount_to_pay_sum,     # Importe(N:15.2)
+            len(_ids),              # Cantidad de Documentos(I:5)
+            _fecha_pago,            # Fecha de Pago(D:8)
+            _referencia,            # Referencia(C:18)
+            '1',                    # Tipo de Cobro(I:3)
+            '1',                    # Debito Crédito(I:1)
+            '1982073',              # Cuenta Débito(I:9)
+            '10',                   # Sucursal Débito(I:3)
+            '20',                   # Módulo Débito(I:3)
+            '6900',                 # Moneda Débito(I:4)
+            '0',                    # Operación Débito(I:9)
+            '0',                    # Sub Operación Débito(I:3)
+            '0'                     # Tipo Operación Débito(I:3)
+            )
+
+
         file_content = str.encode(file_content_header + file_content_detail)
         # Create temporary file, write info and download
         tmp_file = tempfile.TemporaryFile()

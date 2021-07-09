@@ -16,13 +16,16 @@
     'website': "http://www.hcsinergia.com",
     #'sequence': 99,
     # any module necessary for this one to work correctly
-    'depends': ['base', 'contacts'],
+    'depends': ['base', 'contacts', 'report_xlsx'],
     # always loaded
     'data': [
         'security/security.xml',
         'security/ir.model.access.csv',
         'wizard/bm_official_wizard_views.xml',
         'wizard/bm_official_salary_wizard_views.xml',
+        'wizard/bm_official_departure_wizard_views.xml',
+        'reports/bm_official_salary_report.xml',
+        'reports/bm_official_departure_report.xml',
         'views/assets.xml',
         'views/webclient_templates.xml',
         'views/res_country.xml',

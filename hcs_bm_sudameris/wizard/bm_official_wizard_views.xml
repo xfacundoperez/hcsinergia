@@ -22,7 +22,35 @@
             <field name="name">Funcionarios</field>
             <field name="res_model">bm.official.wizard</field>
             <field name="view_mode">form</field>
+            <field name="view_id" ref="bm_official_wizard_view_form" />
             <field name="target">new</field>
         </record>
+
+        <record id="bm_official_wizard_reject_cam_view_form" model="ir.ui.view">
+            <field name="name">bm.official.wizard.rejectcam.form</field>
+            <field name="model">bm.official.wizard.rejectcam</field>
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <group col="2" colspan="4">
+                            <field name="reject_reason" />
+                        </group>
+                    </sheet>
+                    <footer>
+                        <button name="button_save" string="Guardar" type="object" class="btn-primary" />
+                        <button string="Cerrar" class="oe_highlight" special="cancel" />
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record id="bm_official_wizard_reject_cam_action" model="ir.actions.act_window">
+            <field name="name">Motivo de rechazo</field>
+            <field name="res_model">bm.official.wizard.rejectcam</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="bm_official_wizard_reject_cam_view_form" />
+            <field name="target">new</field>
+        </record>
+
     </data>
 </odoo>

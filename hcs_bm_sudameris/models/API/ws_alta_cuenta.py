@@ -100,7 +100,7 @@ class SudamerisApi:
       "Ctnom": " ",
       "SubSegm": "N",
       "CodRetorno": " ",
-      "Mensaje": " "
+      "Mensaje": "generar nueva tarjeta de débito"
     }
     ### RESPONSE
     CTNRO:          Cuenta                      |   N(9)

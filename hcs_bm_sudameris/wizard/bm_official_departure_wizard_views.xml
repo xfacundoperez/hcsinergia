@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="bm_official_departure_wizard_view_form" model="ir.ui.view">
+            <field name="name">bm.official.departure.wizard.form</field>
+            <field name="model">bm.official.departure.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Licencia del funcionario">
+                    <sheet>
+                        <group>
+                            <field name="departure_reason" />
+                            <field name="departure_description" />
+                            <field name="departure_start" />
+                            <field name="departure_end"  attrs="{'readonly': [('departure_reason', 'in', ['fired', 'resigned', 'retired'])], 'required': [('departure_reason', '=', 'medical')]}" />
+                        </group>
+                    </sheet>
+                    <footer>
+                        <button name="button_save" string="Guardar" type="object" class="btn-primary" />
+                        <button string="Cerrar" class="oe_highlight" special="cancel" />
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record id="bm_official_departure_wizard_action" model="ir.actions.act_window">
+            <field name="name">Información de Licencia</field>
+            <field name="res_model">bm.official.departure.wizard</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="bm_official_departure_wizard_view_form" />
+            <field name="target">new</field>
+        </record>
+    </data>
+</odoo>

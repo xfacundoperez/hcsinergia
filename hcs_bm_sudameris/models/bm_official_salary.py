@@ -3,7 +3,6 @@ from odoo import models, fields, api, _
 from odoo.exceptions import UserError, ValidationError, Warning
 from datetime import datetime
 import logging, json, requests
-
 _logger = logging.getLogger(__name__)
 
 
@@ -12,13 +11,18 @@ class BM_OfficialSalary(models.Model):
   _description = 'Movimiento de salario del funcionaro'
   _rec_name = 'official'
 
-  identification_id = fields.Char(string='Nº identificación', required=True)
-  official = fields.Many2one('bm.official', 'Funcionario', compute='_check_official', store=True)
-  currency_type = fields.Selection([
+  @api.depends('amount_to_pay', 'official_gross_salary')
+  def _compute_amount_to_pay(self):
+    self.amount_to_pay = self.official_gross_salary
+
+  official = fields.Many2one('bm.official', 'Funcionario')
+  official_identification_id = fields.Char(string='Nº identificación', related='official.identification_id', readonly=True)
+  official_company_id = fields.Many2one('res.company', related='official.company_id', readonly=True)
+  official_currency_type = fields.Selection([
       ('6900', 'Guaraníes'),
       ('1', 'Dólares Americanos')], strsng="Moneda", related='official.currency_type', readonly=True)
   official_gross_salary = fields.Float("Salario del funcionario", digits=(18, 2), related='official.gross_salary', readonly=True)
-  amount_to_pay = fields.Float(string="Salario a pagar", digits=(18, 2))
+  amount_to_pay = fields.Float(string="Salario a pagar", digits=(18, 2), compute=_compute_amount_to_pay, store=True)
   charge_type = fields.Selection([
       ('1', 'Sueldo'),
       ('2', 'Aguinaldo'),
@@ -41,6 +45,7 @@ class BM_OfficialSalary(models.Model):
       ('check', 'En Proceso'),
       ('cancel', 'Cancelado'),
       ('done', 'Liquidado')], string="Estado", default='draft')
+  movement_id = fields.Many2one('bm.official.salary.history')
 
   def show_message(self, title, message):
     return {
@@ -53,26 +58,6 @@ class BM_OfficialSalary(models.Model):
       'target': 'new'
     }
 
-  @api.onchange('identification_id')
-  def on_change_identification_id(self):
-    _found = False
-    if (self.identification_id):
-      for official in self.env['bm.official'].search([('identification_id', '=', self.identification_id)]):
-        _found = True
-        self.official = official
-        self.amount_to_pay = official.gross_salary
-      if not _found:
-        self.official = None
-        self.amount_to_pay = 0    
-    
-  @api.depends('identification_id', 'amount_to_pay')    
-  def _check_official(self):
-    for official_salary in self:
-      if official_salary.identification_id:
-        for official in self.env['bm.official'].search([('identification_id', '=', official_salary.identification_id)]):
-          official_salary.official = official
-          official_salary.amount_to_pay = official.gross_salary        
-    
   def btn_aprobar(self):
     for official_salary in self:
       official_salary.state = 'aproved'
@@ -81,39 +66,41 @@ class BM_OfficialSalary(models.Model):
     for official_salary in self:
       official_salary.state = 'draft'
 
-  # Hacer funcion async para obtener la respuesta
-  def obtener_token(self):
-    #import wdb
-    #wdb.set_trace()
-    config_parameter = self.env['ir.config_parameter'].sudo()
-    sudameris_auth = json.loads(config_parameter.get_param('sudameris.auth'))
-    # Si la fecha de hoy es mayor a la fecha de expiración
-    if datetime.now() > datetime.strptime(sudameris_auth['expiration'], '%Y-%m-%d %H:%M:%S'):
-      r = requests.post('https://alertaseg.com.ar:8089/api/alerta_gps/check', data={})
-      return r.content
-      # raise ValidationError(json.dumps(r, indent=4))
-      ### Me contecto al banco y espero respuesta del mismo *CREAR CONEXION VIA POST
-      #
-      # Guardo los nuevos datos en el parametro
-      sudameris_auth = '{"token": "TOKEN_TEST","expiration":"2021-02-01 00:00:00"}'
-      config_parameter.set_param('sudameris.auth', sudameris_auth)
-      sudameris_auth = json.loads(sudameris_auth)
-      #
-      ### Finalizo la configuración del banco
-    # Siempre retorno el token valido
-    return sudameris_auth
-
   def create_file_txt(self):
-    _ids = []
-    # Obtengo los movimientos seleccionados
-    for official_salary in self.env['bm.official.salary'].browse(self._context.get('active_ids')):
-      if official_salary.state == 'aproved':
-        _ids.append('{}'.format(official_salary.id))
+    #aproved_moves = self.search([('state', '=', 'aproved')])
+    #if aproved_moves:
+    #  last_movement = self.env['bm.official.salary.history'].create({'official_salary_ids': [(6, 0, aproved_moves.ids)]})
+    #  for rec in aproved_moves:
+    #    rec.movement_id = last_movement.id
+    #    rec.state = 'check'
+    # Los registros que están aprobados, los seteo en proceso
+    for rec in self:
+      if rec.state == 'aproved':
+        rec.state == 'check'
+    # Obtengo solo los ID de los que están en proceso y si hay alguno, genero el archivo de pago
+    _ids = self.search([('state', 'in', ['check'])]).ids
     if _ids:
       return {
         'type': 'ir.actions.act_url',
-        'url': '/web/binary_text/create_file_txt?ids={}'.format(','.join(_ids)),
+        'url': '/web/binary_text/create_file_txt?ids={}'.format(', '.join([str(_id) for _id in _ids])),
         'target': 'self'
       }
     else:
       return self.show_message('Generar Pago', 'No se generó ningun pago')
+
+
+class BM_OfficialSalaryHistory(models.Model):
+  _name = 'bm.official.salary.history'
+  _description = 'Historial de Movimiento de salario'
+
+  def _compute_name(self):
+    for rec in self:
+      rec.name = "Movimiento N°{}".format(rec.id)
+
+  name = fields.Char(compute="_compute_name")
+  official_salary_ids = fields.Many2many('bm.official.salary', 'official_salary_rel', 'official_id')
+
+  #def create_file_txt(self, last_movement=None):
+  #  return True
+  #  if not last_movement:
+  #    last_movement = self.env['bm.official.salary.history'].search('id', 'in', self.env._context.get('active_ids'))
